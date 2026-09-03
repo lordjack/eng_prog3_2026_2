@@ -7,7 +7,7 @@ class db
     private $user     = 'root';
     private $password = '';
     private $port     = '3306';
-    private $dbname   = 'db_pweb1_202x_x';
+    private $dbname   = 'db_prog_202x_x';
     private $table_name;
     private $conn; // conexão fica guardada para reutilizar
 
