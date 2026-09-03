@@ -2,12 +2,11 @@
 
 class db
 {
-
-    private $host     = 'localhost';
-    private $user     = 'root';
+    private $host = 'localhost';
+    private $user = 'root';
     private $password = '';
-    private $port     = '3306';
-    private $dbname   = 'db_pweb1_202x_x';
+    private $port = '3306';
+    private $dbname = 'taskmanager';
     private $table_name;
     private $conn; // conexão fica guardada para reutilizar
 
@@ -47,19 +46,22 @@ class db
     //INSERT INTO tabela ('campo1', 'campo2') VALUES (?, ?);
     public function store($dados)
     {
-        $campos = "";
-        $marcadores = "";
+        // var_dump($dados);
+        // exit;
+        $campos = '';
+        $marcadores = '';
         $vetorData = [];
-        $sep = "";
+        $sep = '';
 
         foreach ($dados as $campo => $valor) {
             $campos .= $sep . $campo;
-            $marcadores .= $sep . "?";
+            $marcadores .= $sep . '?';
             $vetorData[] = $valor;
-            $sep = ",";
+            $sep = ',';
         }
         $sql = "INSERT INTO $this->table_name ($campos) VALUES ($marcadores);";
-
+        var_dump($sql, $vetorData);
+      //  exit();
         //codigo para debugar algum erro
         // var_dump($sql, $dados);
         // exit;
@@ -67,7 +69,7 @@ class db
             $st = $this->conn->prepare($sql);
             $st->execute($vetorData);
         } catch (PDOException $e) {
-            throw new Exception("Erro ao inserir: ", $e->getMessage());
+            throw new Exception('Erro ao inserir: ', $e->getMessage());
         }
     }
 
@@ -94,15 +96,15 @@ class db
     //UPDATE tabela SET campo1 = ?, campo2 = ? WHERE id = ?
     public function update($id, $dados)
     {
-        $campos = "";
+        $campos = '';
         $vetorData = [];
-        $sep = "";
+        $sep = '';
 
         foreach ($dados as $campo => $valor) {
             if ($campo !== 'id') {
                 $campos .= $sep . "$campo = ?";
                 $vetorData[] = $valor;
-                $sep = ", ";
+                $sep = ', ';
             }
         }
 
@@ -113,7 +115,7 @@ class db
             $st = $this->conn->prepare($sql);
             $st->execute($vetorData);
         } catch (PDOException $e) {
-            throw new Exception("Erro ao atualizar: " . $e->getMessage());
+            throw new Exception('Erro ao atualizar: ' . $e->getMessage());
         }
     }
 
@@ -126,23 +128,23 @@ class db
             $st = $this->conn->prepare($sql);
             $st->execute([$id]);
         } catch (PDOException $e) {
-            throw new Exception("Erro ao deletar: " . $e->getMessage());
+            throw new Exception('Erro ao deletar: ' . $e->getMessage());
         }
     }
 
     //SEARCH - Busca por dois campos usando LIKE
-    public function search($campo1, $campo2, $termo)
+    public function search($campo1, $termo)
     {
-        $sql = "SELECT * FROM $this->table_name WHERE $campo1 LIKE ? OR $campo2 LIKE ?";
+        $sql = "SELECT * FROM $this->table_name WHERE $campo1 LIKE ?";
 
         try {
             $st = $this->conn->prepare($sql);
             $termoLike = "%$termo%";
-            $st->execute([$termoLike, $termoLike]);
+            $st->execute([$termoLike]);
 
             return $st->fetchAll(PDO::FETCH_CLASS);
         } catch (PDOException $e) {
-            throw new Exception("Erro ao buscar: " . $e->getMessage());
+            throw new Exception('Erro ao buscar: ' . $e->getMessage());
         }
     }
 }
