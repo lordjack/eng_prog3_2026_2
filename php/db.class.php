@@ -5,8 +5,8 @@ class db
     private $host = 'localhost';
     private $user = 'root';
     private $password = '';
-    private $port = '3306';
-    private $dbname = 'taskmanager';
+    private $port     = '3306';
+    private $dbname   = 'db_prog_202x_x';
     private $table_name;
     private $conn; // conexão fica guardada para reutilizar
 
@@ -46,6 +46,7 @@ class db
     //INSERT INTO tabela ('campo1', 'campo2') VALUES (?, ?);
     public function store($dados)
     {
+        unset($dados['id']);
         // var_dump($dados);
         // exit;
         $campos = '';

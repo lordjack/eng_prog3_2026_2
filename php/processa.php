@@ -13,8 +13,7 @@ if ($_POST['nome'] === '' || $_POST['email'] === '') {
 $db = new db('usuarios');
 
 if (empty($_POST['id'])) {
-    unset($_POST['id']);
-    $db->store($_POST);
+     $db->store($_POST);
 } else {
     $db->update($_POST['id'], $_POST);
 }
