@@ -24,13 +24,14 @@ class Produto
         return $dados ?: null;
     }
 
-    public function criar(string $nome, float $preco, int $qtd): void
+    public function criar($dados): void
     {
-        $this->db->store([
-            'nome' => $nome,
-            'preco' => $preco,
-            'quantidade' => $qtd,
-        ]);
+        $this->db->store($dados);
+    }
+
+    public function atualizar($dados): void
+    {
+        $this->db->update($dados['id'], $dados);
     }
 
     public function excluir(int $id): void

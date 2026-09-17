@@ -3,15 +3,36 @@
 // controllers/ProdutoController.php
 
 require_once 'model/Produto.php';
-require_once 'Controller.php';
+require_once 'JSON.php';
 
-class ProdutoController extends Controller
+class ProdutoController extends JSON
 {
     private Produto $model;
 
     public function __construct()
     {
         $this->model = new Produto();
+    }
+
+    public function criar($dados): void
+    {
+        $this->model->criar($dados);
+
+        $this->resposta(['sucesso' => true, 'dados' => 'Criado com sucesso!']);
+    }
+
+    public function atualizar($dados): void
+    {
+        $this->model->atualizar($dados);
+
+        $this->resposta(['sucesso' => true, 'dados' => 'Atualizado com sucesso!']);
+    }
+
+    public function excluir($id): void
+    {
+        $this->model->excluir($id);
+
+        $this->resposta(['sucesso' => true, 'dados' => 'Excluido com sucesso!']);
     }
 
     public function listar(): void
