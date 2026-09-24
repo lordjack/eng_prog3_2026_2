@@ -1,0 +1,177 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: API - PHP
+meta:
+  id: wrk_3f70726056324823ac8c3ff8aada1c81
+  created: 1790269852723
+  modified: 1790269852723
+  description: ""
+collection:
+  - name: Produto
+    meta:
+      id: fld_5c7c13bcc0e945958797231623c3607d
+      created: 1790269863785
+      modified: 1790269863785
+      sortKey: -1790269863785
+      description: ""
+    children:
+      - url: "{{ _.baseUrl }}produtos"
+        name: Listagem Todos
+        meta:
+          id: req_769547a2061d4ada8b7e28645721fe00
+          created: 1790269898499
+          modified: 1790270620502
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898499
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}produtos"
+        name: Cadastrar
+        meta:
+          id: req_0a6c246b1c2d4f90996c2f289e7da0d9
+          created: 1790270647261
+          modified: 1790270798937
+          isPrivate: false
+          description: ""
+          sortKey: -1790270647261
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"nome": "Camisa Polo",
+            	"preco":89.5,
+            	"quantidade":10
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}produtos"
+        name: Atualizar
+        meta:
+          id: req_8097aa8f1b8c4f59a6790e6f1f677e43
+          created: 1790270824181
+          modified: 1790270864770
+          isPrivate: false
+          description: ""
+          sortKey: -1790270272880
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"id":1,
+            	"nome": "Camisa Básica",
+            	"preco":50,
+            	"quantidade":50
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}produtos/2"
+        name: Buscar ID
+        meta:
+          id: req_f76f5dd2bba44130b7dc663a2fd6a192
+          created: 1790270913594
+          modified: 1790271194963
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898449
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}produtos/5"
+        name: Deletar
+        meta:
+          id: req_f33c5d19646743dc892557f073396a58
+          created: 1790271009903
+          modified: 1790271052390
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898399
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}produtos/buscar?campo=nome&valor=Camisa "
+        name: Buscar Valor
+        meta:
+          id: req_7fa9a7f787994ad8984f566c1b69369c
+          created: 1790272057736
+          modified: 1790273456122
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898424
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Categoria
+    meta:
+      id: fld_14fe90f0069942d4973d1b819a1e8246
+      created: 1790269878013
+      modified: 1790269878013
+      sortKey: -1790269878013
+      description: ""
+  - name: Usuário
+    meta:
+      id: fld_0cfb7ed181664b4493b69e7c8f639524
+      created: 1790269886659
+      modified: 1790269886659
+      sortKey: -1790269886659
+      description: ""
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_bf9a19fef9919055e0cfa2d19e2aaaffcf3a380d
+    created: 1790269852731
+    modified: 1790269852731
+environments:
+  name: Base Environment
+  meta:
+    id: env_bf9a19fef9919055e0cfa2d19e2aaaffcf3a380d
+    created: 1790269852727
+    modified: 1790269998331
+    isPrivate: false
+  data:
+    baseUrl: http://localhost/eng_prog3_2026_2/php/api/

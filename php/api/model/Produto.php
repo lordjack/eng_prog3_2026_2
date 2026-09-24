@@ -24,6 +24,12 @@ class Produto
         return $dados ?: null;
     }
 
+    public function buscarPor(string $campo, string $valor): ?array
+    {
+        $dados = $this->db->findBy($campo, $valor);
+        return $dados ?: null;
+    }
+
     public function criar($dados): void
     {
         $this->db->store($dados);

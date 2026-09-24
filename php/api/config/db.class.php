@@ -47,8 +47,6 @@ class db
     public function store($dados)
     {
         unset($dados['id']);
-        // var_dump($dados);
-        // exit;
         $campos = '';
         $marcadores = '';
         $vetorData = [];
@@ -61,8 +59,7 @@ class db
             $sep = ',';
         }
         $sql = "INSERT INTO $this->table_name ($campos) VALUES ($marcadores);";
-        var_dump($sql, $vetorData);
-        //  exit();
+
         //codigo para debugar algum erro
         // var_dump($sql, $dados);
         // exit;
@@ -77,21 +74,30 @@ class db
     //SELECT * FROM tabela WHERE id = ?
     public function find($id)
     {
-        $sql = "SELECT * FROM $this->table_name WHERE id = ?";
-        $st = $this->conn->prepare($sql);
-        $st->execute([$id]);
+        try {
+            $sql = "SELECT * FROM $this->table_name WHERE id = ?";
+            $st = $this->conn->prepare($sql);
+            $st->execute([$id]);
 
-        return $st->fetchObject();
+            return $st->fetchObject();
+        } catch (PDOException $e) {
+            throw new Exception('Erro ao buscar: ' . $e->getMessage());
+        }
     }
 
     //SELECT * FROM tabela WHERE campo = valor
     public function findBy($campo, $valor)
     {
-        $sql = "SELECT * FROM $this->table_name WHERE $campo = ?";
-        $st = $this->conn->prepare($sql);
-        $st->execute([$valor]);
+        try {
+            $sql = "SELECT * FROM $this->table_name WHERE $campo LIKE ?";
+            $st = $this->conn->prepare($sql);
 
-        return $st->fetchObject();
+            $st->execute(["%$valor%"]);
+
+            return $st->fetchAll(PDO::FETCH_CLASS);
+        } catch (PDOException $e) {
+            throw new Exception('Erro ao buscar: ' . $e->getMessage());
+        }
     }
 
     //UPDATE tabela SET campo1 = ?, campo2 = ? WHERE id = ?
@@ -130,22 +136,6 @@ class db
             $st->execute([$id]);
         } catch (PDOException $e) {
             throw new Exception('Erro ao deletar: ' . $e->getMessage());
-        }
-    }
-
-    //SEARCH - Busca por dois campos usando LIKE
-    public function search($campo1, $termo)
-    {
-        $sql = "SELECT * FROM $this->table_name WHERE $campo1 LIKE ?";
-
-        try {
-            $st = $this->conn->prepare($sql);
-            $termoLike = "%$termo%";
-            $st->execute([$termoLike]);
-
-            return $st->fetchAll(PDO::FETCH_CLASS);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao buscar: ' . $e->getMessage());
         }
     }
 }
