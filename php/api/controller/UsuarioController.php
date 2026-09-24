@@ -1,35 +1,36 @@
 <?php
 
-// controllers/ProdutoController.php
+// controllers/UsuarioController.php
 
-require_once 'model/Produto.php';
+require_once 'model/Usuario.php';
 require_once 'JSON.php';
 
-class ProdutoController extends JSON
+class UsuarioController extends JSON
 {
-    private Produto $model;
+    private Usuario $model;
 
     public function __construct()
     {
-        $this->model = new Produto();
+        $this->model = new Usuario();
     }
 
     public function criar(): void
     {
-        $dados = $this->getData();
-
-        if (
-            empty($dados['nome']) ||
-            !isset($dados['preco']) ||
-            !isset($dados['quantidade'])
-        ) {
-            $this->respostaError(
-                'Campos obrigatórios: nome, preço, quantidade',
-                400
-            );
-            return;
-        }
         try {
+            $dados = $this->getData();
+
+            if (
+                empty($dados['nome']) ||
+                !isset($dados['email']) ||
+                !isset($dados['telefone'])
+            ) {
+                $this->respostaError(
+                    'Campos obrigatórios: nome, preço, quantidade',
+                    400
+                );
+                return;
+            }
+
             $this->model->criar($dados);
 
             $this->resposta([
@@ -65,8 +66,8 @@ class ProdutoController extends JSON
 
     public function listar(): void
     {
-        $produtos = $this->model->listar();
-        $this->resposta(['sucesso' => true, 'dados' => $produtos]);
+        $usuarios = $this->model->listar();
+        $this->resposta(['sucesso' => true, 'dados' => $usuarios]);
     }
 
     public function buscarPor(): void
@@ -74,15 +75,15 @@ class ProdutoController extends JSON
         $campo = $_GET['campo'];
         $valor = $_GET['valor'];
 
-        $produto = $this->model->buscarPor($campo, $valor);
+        $usuario = $this->model->buscarPor($campo, $valor);
 
-        if ($produto) {
-            $this->resposta(['sucesso' => true, 'dados' => $produto]);
+        if ($usuario) {
+            $this->resposta(['sucesso' => true, 'dados' => $usuario]);
         } else {
             $this->resposta(
                 [
                     'sucesso' => false,
-                    'erro' => 'Produto nao encontrado',
+                    'erro' => 'Usuario nao encontrado',
                 ],
                 404
             );
@@ -91,14 +92,14 @@ class ProdutoController extends JSON
 
     public function buscar(int $id): void
     {
-        $produto = $this->model->buscar($id);
-        if ($produto) {
-            $this->resposta(['sucesso' => true, 'dados' => $produto]);
+        $usuario = $this->model->buscar($id);
+        if ($usuario) {
+            $this->resposta(['sucesso' => true, 'dados' => $usuario]);
         } else {
             $this->resposta(
                 [
                     'sucesso' => false,
-                    'erro' => 'Produto nao encontrado',
+                    'erro' => 'Usuario nao encontrado',
                 ],
                 404
             );

@@ -38,7 +38,7 @@ collection:
         meta:
           id: req_0a6c246b1c2d4f90996c2f289e7da0d9
           created: 1790270647261
-          modified: 1790270798937
+          modified: 1790280295885
           isPrivate: false
           description: ""
           sortKey: -1790270647261
@@ -47,7 +47,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"nome": "Camisa Polo",
+            	"nome": ,
             	"preco":89.5,
             	"quantidade":10
             }
@@ -153,13 +153,147 @@ collection:
       modified: 1790269878013
       sortKey: -1790269878013
       description: ""
-  - name: Usuário
+  - name: Usuario
     meta:
-      id: fld_0cfb7ed181664b4493b69e7c8f639524
-      created: 1790269886659
-      modified: 1790269886659
-      sortKey: -1790269886659
+      id: fld_dc0dba2de06c4f57847ba747528649bf
+      created: 1790278699146
+      modified: 1790278699146
+      sortKey: -1790269863735
       description: ""
+    children:
+      - url: "{{ _.baseUrl }}usuarios/6"
+        name: Deletar
+        meta:
+          id: req_3d9cc76566ac4bc49b41eac4f263d81c
+          created: 1790278699146
+          modified: 1790278991626
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898399
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}usuarios"
+        name: Cadastrar
+        meta:
+          id: req_5d9f02ca8dcf4140812cae1a8ba906b7
+          created: 1790278699146
+          modified: 1790280157924
+          isPrivate: false
+          description: ""
+          sortKey: -1790270647261
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            			"nome": "",
+            			"email": "jJose@ifsc.edu.br",
+            			"telefone": "49 98862-0700",
+            			"ativo": 1
+            		}
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}usuarios"
+        name: Listagem Todos
+        meta:
+          id: req_5f6e7f77240a4b68a71e63dee8d591b5
+          created: 1790278699146
+          modified: 1790278715557
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898499
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}usuarios"
+        name: Atualizar
+        meta:
+          id: req_9e317fcb89244d3681bcedf6352b412d
+          created: 1790278699146
+          modified: 1790279018489
+          isPrivate: false
+          description: ""
+          sortKey: -1790270272880
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            		{
+            			"id": 7,
+            			"nome": "Jackson",
+            			"email": "Jackson@ifsc.edu.br",
+            			"telefone": "49 98862-0700",
+            			"ativo": 1
+            		}
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}usuarios/6"
+        name: Buscar ID
+        meta:
+          id: req_b13ae1fd7c6845edb3fc8854ba24a437
+          created: 1790278699146
+          modified: 1790278966645
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898449
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseUrl }}usuarios/buscar?campo=nome&valor=Maria "
+        name: Buscar Valor
+        meta:
+          id: req_fe22b141509643e8ad104439ee43cc16
+          created: 1790278699146
+          modified: 1790278980651
+          isPrivate: false
+          description: ""
+          sortKey: -1790269898424
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:

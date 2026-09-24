@@ -10,6 +10,17 @@ class JSON
         echo json_encode($dados, JSON_PRETTY_PRINT);
     }
 
+    public function respostaError(string $erro, int $status = 400): void
+    {
+        $this->resposta(
+            [
+                'sucesso' => false,
+                'erro' => $erro,
+            ],
+            $status
+        );
+    }
+
     public function getData()
     {
         $json = file_get_contents('php://input');
