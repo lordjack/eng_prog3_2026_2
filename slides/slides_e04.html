@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E04 - SQL Avancado: JOINs, Subqueries, Indices e Otimizacao</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E04</h1>
+    <div class="subtitle">SQL Avancado — JOINs, Subqueries e Otimizacao</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: JOINs</span>
+      <span class="tag tag-green">Aulas 3-4: Subqueries + Performance</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 26</div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E04</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">INNER JOIN e alias de tabelas. <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">LEFT/RIGHT JOIN, auto-relacionamento. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">Subqueries: WHERE, IN, EXISTS, FROM. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (70 min)</div><div class="box-body">Indices na pratica, EXPLAIN e otimizacao basica. <strong>Exercicio final + duvidas.</strong></div></div>
+  <div class="slide-number">2 / 26</div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide">
+  <div class="aula-tag">Revisao</div>
+  <h1>Revisao rapida do E03</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">O que ja sabemos</div><div class="box-body">SELECT com WHERE, ORDER BY, LIMIT. Agregacao com COUNT/SUM/AVG. GROUP BY + HAVING.</div></div>
+    <div class="box"><div class="box-title">A limitacao</div><div class="box-body">Ate agora, tudo em UMA tabela. Mas dados normalizados vivem em VARIAS tabelas!</div></div>
+  </div>
+  <h2>O problema de hoje</h2>
+  <pre>-- Isso mostra so o NUMERO do usuario... quem e o usuario 1??
+SELECT id_tarefa, titulo, id_usuario FROM tarefas;
+
+-- Queremos: titulo da tarefa + NOME do dono.
+-- A resposta esta em OUTRA tabela. Precisamos de JOIN!</pre>
+  <div class="slide-number">3 / 26</div>
+</div>
+
+<!-- AULA 1 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INNER JOIN</h1>
+  <div class="sub">Conectando tabelas relacionadas</div>
+  <div class="slide-number">4 / 26</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>O que e um JOIN?</h1>
+  <p>JOIN combina linhas de duas tabelas usando a coluna em comum (FK -> PK).</p>
+  <div class="two-col">
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">usuarios</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id</th><th>nome</th></tr>
+        <tr><td>1</td><td>Ana</td></tr>
+        <tr><td>2</td><td>Bruno</td></tr>
+        <tr><td>3</td><td>Carla</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">tarefas</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id</th><th>titulo</th><th>id_usuario</th></tr>
+        <tr><td>10</td><td>Estudar SQL</td><td>1</td></tr>
+        <tr><td>11</td><td>Fazer API</td><td>1</td></tr>
+        <tr><td>12</td><td>Revisar BD</td><td>2</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:8px;"><span class="tag tag-green">JOIN</span> O <code>id_usuario</code> da tarefa "aponta" para o <code>id</code> do usuario. O JOIN segue essa seta!</p>
+  <div class="slide-number">5 / 26</div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INNER JOIN — sintaxe</h1>
+  <pre>SELECT t.titulo, t.status, u.nome AS autor
+FROM tarefas t
+INNER JOIN usuarios u ON u.id_usuario = t.id_usuario;</pre>
+  <table>
+    <tr><th>titulo</th><th>status</th><th>autor</th></tr>
+    <tr><td>Estudar SQL</td><td>pendente</td><td>Ana</td></tr>
+    <tr><td>Fazer API</td><td>em_andamento</td><td>Ana</td></tr>
+    <tr><td>Revisar BD</td><td>concluida</td><td>Bruno</td></tr>
+  </table>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Alias (t, u)</div><div class="box-body">Apelidos curtos evitam repetir o nome da tabela. Obrigatorio quando ha colunas com o mesmo nome.</div></div>
+    <div class="box"><div class="box-title">ON</div><div class="box-body">Define a condicao de ligacao: FK de um lado, PK do outro.</div></div>
+  </div>
+  <div class="slide-number">6 / 26</div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>JOIN com WHERE, GROUP BY e multiplas tabelas</h1>
+  <pre>-- JOIN + filtro: tarefas pendentes com nome do dono
+SELECT t.titulo, u.nome
+FROM tarefas t
+INNER JOIN usuarios u ON u.id_usuario = t.id_usuario
+WHERE t.status = 'pendente';
+
+-- JOIN + agregacao: total de tarefas por usuario
+SELECT u.nome, COUNT(t.id_tarefa) AS total
+FROM usuarios u
+INNER JOIN tarefas t ON t.id_usuario = u.id_usuario
+GROUP BY u.id_usuario, u.nome
+ORDER BY total DESC;</pre>
+  <p><span class="tag tag-gray">Regra</span> N tabelas = N-1 JOINs. Tres tabelas? Dois JOINs encadeados.</p>
+  <div class="slide-number">7 / 26</div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">JOINs para resolver</div>
+    <div class="box-body">
+      1. Liste titulo, status e nome do autor de cada tarefa.<br>
+      2. Liste as tarefas de prioridade alta com o email do autor.<br>
+      3. Conte quantas tarefas cada usuario tem (nome + total).<br>
+      4. Liste titulo e autor das tarefas concluidas, ordenadas pela mais recente.
+    </div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">Desafio</div>
+    <div class="box-body">Usando o banco <code>loja</code> do E02: liste produto, preco e nome da categoria (produtos JOIN categorias).</div>
+  </div>
+  <div class="slide-number">8 / 26</div>
+</div>
+
+<!-- AULA 2 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>LEFT e RIGHT JOIN</h1>
+  <div class="sub">Quando nem tudo tem correspondencia</div>
+  <div class="slide-number">9 / 26</div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>INNER vs LEFT vs RIGHT</h1>
+  <table>
+    <tr><th>Tipo</th><th>O que retorna</th><th>Exemplo de uso</th></tr>
+    <tr><td><code>INNER JOIN</code></td><td>So quem tem correspondencia nos DOIS lados</td><td>Tarefas + seus donos</td></tr>
+    <tr><td><code>LEFT JOIN</code></td><td>TODOS da esquerda + NULL onde nao ha par</td><td>Todos os usuarios, mesmo sem tarefa</td></tr>
+    <tr><td><code>RIGHT JOIN</code></td><td>TODOS da direita + NULL onde nao ha par</td><td>Raro; geralmente da pra inverter p/ LEFT</td></tr>
+  </table>
+  <h2>LEFT JOIN na pratica</h2>
+  <pre>-- TODOS os usuarios, com total de tarefas (0 para quem nao tem)
+SELECT u.nome, COUNT(t.id_tarefa) AS total
+FROM usuarios u
+LEFT JOIN tarefas t ON t.id_usuario = u.id_usuario
+GROUP BY u.id_usuario, u.nome;</pre>
+  <div class="warn"><div class="warn-title">Por que COUNT(t.id) e nao COUNT(*)?</div><div class="box-body">Sem tarefa, o LEFT JOIN gera uma linha com t.* = NULL. COUNT(coluna) ignora NULLs e conta 0 corretamente. COUNT(*) contaria 1!</div></div>
+  <div class="slide-number">10 / 26</div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Encontrando "orfaos" com LEFT JOIN</h1>
+  <p>Padrao poderoso: <code>LEFT JOIN ... WHERE coluna_da_direita IS NULL</code> acha o que NAO tem par.</p>
+  <pre>-- Usuarios que NUNCA criaram tarefa
+SELECT u.nome, u.email
+FROM usuarios u
+LEFT JOIN tarefas t ON t.id_usuario = u.id_usuario
+WHERE t.id_tarefa IS NULL;
+
+-- Tarefas sem comentarios (se houvesse tabela comentarios)
+SELECT t.titulo
+FROM tarefas t
+LEFT JOIN comentarios c ON c.id_tarefa = t.id_tarefa
+WHERE c.id_comentario IS NULL;</pre>
+  <div class="box"><div class="box-title">Casos de uso reais</div><div class="box-body">Clientes sem pedidos, produtos nunca vendidos, alunos sem matricula — relatorios de "ausencia" usam esse padrao.</div></div>
+  <div class="slide-number">11 / 26</div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>SELF JOIN — tabela relacionada a ela mesma</h1>
+  <p>Uma tabela pode ter FK para sua propria PK. Ex: funcionario -> gerente (que tambem e funcionario).</p>
+  <pre>-- Estrutura: funcionarios(id, nome, id_gerente FK -> funcionarios.id)
+SELECT f.nome AS funcionario, g.nome AS gerente
+FROM funcionarios f
+LEFT JOIN funcionarios g ON g.id = f.id_gerente;</pre>
+  <table>
+    <tr><th>funcionario</th><th>gerente</th></tr>
+    <tr><td>Pedro</td><td>Ana</td></tr>
+    <tr><td>Lucas</td><td>Ana</td></tr>
+    <tr><td>Ana</td><td>NULL (diretora!)</td></tr>
+  </table>
+  <p><span class="tag tag-gray">Ponto-chave</span> A MESMA tabela entra 2x no FROM com alias diferentes (f e g).</p>
+  <div class="slide-number">12 / 26</div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">LEFT JOINs para resolver</div>
+    <div class="box-body">
+      1. Liste TODOS os usuarios com total de tarefas (incluindo quem tem 0).<br>
+      2. Liste apenas os usuarios SEM nenhuma tarefa.<br>
+      3. No banco <code>loja</code>: liste todas as categorias com total de produtos (inclusive as vazias).<br>
+      4. Liste produtos SEM categoria valida (categorias orfas ao contrario).
+    </div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">Compare</div>
+    <div class="box-body">Rode a consulta 1 com INNER e com LEFT JOIN. Qual a diferenca no resultado? Por que?</div>
+  </div>
+  <div class="slide-number">13 / 26</div>
+</div>
+
+<!-- AULA 3 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Subqueries</h1>
+  <div class="sub">Consultas dentro de consultas</div>
+  <div class="slide-number">14 / 26</div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Subquery no WHERE</h1>
+  <pre>-- Tarefas do usuario "Ana" (sem saber o id dela!)
+SELECT titulo FROM tarefas
+WHERE id_usuario = (SELECT id_usuario FROM usuarios WHERE nome = 'Ana Silva');
+
+-- Produtos acima do preco medio
+SELECT nome, preco FROM produtos
+WHERE preco > (SELECT AVG(preco) FROM produtos);</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Subquery escalar</div><div class="box-body">Retorna 1 valor so. Usa com <code>=</code>, <code>&gt;</code>, <code>&lt;</code>.</div></div>
+    <div class="box"><div class="box-title">Erro comum</div><div class="box-body">Se retornar mais de 1 linha, quebra: <em>"Subquery returns more than 1 row"</em>.</div></div>
+  </div>
+  <div class="slide-number">15 / 26</div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Subquery com IN, NOT IN e EXISTS</h1>
+  <pre>-- Usuarios que TEM tarefas
+SELECT nome FROM usuarios
+WHERE id_usuario IN (SELECT DISTINCT id_usuario FROM tarefas);
+
+-- Usuarios SEM tarefas
+SELECT nome FROM usuarios
+WHERE id_usuario NOT IN (SELECT id_usuario FROM tarefas);
+
+-- Mesmo resultado com EXISTS (geralmente mais rapido)
+SELECT nome FROM usuarios u
+WHERE EXISTS (SELECT 1 FROM tarefas t WHERE t.id_usuario = u.id_usuario);</pre>
+  <div class="warn"><div class="warn-title">NOT IN + NULL = armadilha!</div><div class="box-body">Se a subquery puder retornar NULL, o NOT IN nao retorna NADA. Prefira NOT EXISTS ou LEFT JOIN ... IS NULL.</div></div>
+  <div class="slide-number">16 / 26</div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Subquery no FROM (tabela derivada)</h1>
+  <pre>-- Media de tarefas por usuario, calculada sobre o agrupamento
+SELECT AVG(total) AS media_tarefas
+FROM (
+    SELECT u.id_usuario, COUNT(t.id_tarefa) AS total
+    FROM usuarios u
+    LEFT JOIN tarefas t ON t.id_usuario = u.id_usuario
+    GROUP BY u.id_usuario
+) AS resumo;</pre>
+  <div class="box"><div class="box-title">Quando usar</div><div class="box-body">Quando voce precisa agregar UM resultado ja agregado (media das medias, maximo dos totais). A subquery vira uma "tabela temporaria" — note o alias obrigatorio <code>AS resumo</code>.</div></div>
+  <p><span class="tag tag-purple">Dica</span> Se ficou ilegivel, considere dividir em duas consultas no PHP. Legibilidade tambem e performance.</p>
+  <div class="slide-number">17 / 26</div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">Subqueries para resolver</div>
+    <div class="box-body">
+      1. Tarefas do usuario mais antigo (menor <code>criado_em</code>).<br>
+      2. Usuarios que tem tarefa de prioridade 'alta' (IN ou EXISTS).<br>
+      3. Tarefas acima da quantidade media de tarefas por usuario (desafio!).<br>
+      4. Reescreva a consulta 2 com LEFT JOIN e compare.
+    </div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">Reflexao</div>
+    <div class="box-body">Quando subquery e melhor que JOIN? Quando JOIN e melhor que subquery? Discuta com a dupla.</div>
+  </div>
+  <div class="slide-number">18 / 26</div>
+</div>
+
+<!-- AULA 4 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Indices e Otimizacao</h1>
+  <div class="sub">EXPLAIN e consultas rapidas</div>
+  <div class="slide-number">19 / 26</div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Como o MySQL busca seus dados</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Sem indice (full table scan)</div><div class="box-body">Le TODAS as linhas, uma a uma. 1 milhao de linhas = 1 milhao de leituras. Analogia: procurar um nome na lista telefonica folheando pagina por pagina.</div></div>
+    <div class="box"><div class="box-title">Com indice (B-Tree)</div><div class="box-body">Vai direto ao ponto. 1 milhao de linhas = ~20 leituras. Analogia: usar o indice remisso do livro.</div></div>
+  </div>
+  <h2>Relembrando (E02)</h2>
+  <pre>CREATE INDEX idx_tarefa_status ON tarefas(status);
+CREATE INDEX idx_tarefa_user_status ON tarefas(id_usuario, status); -- composto
+SHOW INDEX FROM tarefas;</pre>
+  <p><span class="tag tag-red">Custo</span> Indice acelera SELECT, mas torna INSERT/UPDATE/DELETE mais lentos e ocupa disco.</p>
+  <div class="slide-number">20 / 26</div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>EXPLAIN — o raio-X da consulta</h1>
+  <pre>EXPLAIN SELECT t.titulo, u.nome
+FROM tarefas t
+INNER JOIN usuarios u ON u.id_usuario = t.id_usuario
+WHERE t.status = 'pendente';</pre>
+  <table>
+    <tr><th>Coluna</th><th>O que observar</th><th>Bom sinal</th><th>Mau sinal</th></tr>
+    <tr><td><code>type</code></td><td>Tipo de acesso</td><td>const, eq_ref, ref, range</td><td><strong>ALL</strong> (full scan)</td></tr>
+    <tr><td><code>key</code></td><td>Indice usado</td><td>nome do indice</td><td>NULL</td></tr>
+    <tr><td><code>rows</code></td><td>Linhas estimadas</td><td>baixo</td><td>total da tabela</td></tr>
+  </table>
+  <p><span class="tag tag-green">Pratica</span> Rode EXPLAIN antes e depois de criar um indice e compare o <code>rows</code>!</p>
+  <div class="slide-number">21 / 26</div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Erros que matam o indice</h1>
+  <div class="two-col">
+    <div>
+      <h2>Nao fazem</h2>
+      <pre>-- Funcao na coluna: ignora o indice!
+WHERE YEAR(criado_em) = 2026
+
+-- LIKE com % no inicio
+WHERE titulo LIKE '%SQL'
+
+-- Tipo errado (string vs numero)
+WHERE id_usuario = '1' -- as vezes ok, evite</pre>
+    </div>
+    <div>
+      <h2>Facam assim</h2>
+      <pre>-- Faixa de datas usa o indice
+WHERE criado_em >= '2026-01-01'
+  AND criado_em <  '2027-01-01'
+
+-- LIKE com % so no fim
+WHERE titulo LIKE 'SQL%'
+
+-- Sempre o tipo correto
+WHERE id_usuario = 1</pre>
+    </div>
+  </div>
+  <div class="box" style="margin-top:6px;"><div class="box-title">Indice composto: regra da esquerda</div><div class="box-body"><code>INDEX(a, b)</code> serve para <code>WHERE a=?</code> e <code>WHERE a=? AND b=?</code>, mas NAO para <code>WHERE b=?</code> sozinho.</div></div>
+  <div class="slide-number">22 / 26</div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Boas praticas de otimizacao</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Na consulta</div><div class="box-body">Liste so as colunas necessarias (nada de SELECT *). Use LIMIT quando nao precisa de tudo. Filtre cedo com WHERE. Evite funcoes em colunas indexadas.</div></div>
+    <div class="box"><div class="box-title">No schema</div><div class="box-body">Indice em toda FK e colunas de WHERE/ORDER BY frequentes. Tipos corretos e pequenos (INT vs BIGINT). ANALYZE TABLE periodicamente.</div></div>
+  </div>
+  <pre>-- Estatisticas do otimizador
+ANALYZE TABLE tarefas;
+
+-- Tamanho das tabelas e indices
+SELECT table_name,
+       ROUND(data_length/1024/1024, 2) AS dados_mb,
+       ROUND(index_length/1024/1024, 2) AS indices_mb
+FROM information_schema.TABLES
+WHERE table_schema = 'taskmanager';</pre>
+  <div class="slide-number">23 / 26</div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Antes e depois</div>
+    <div class="box-body">a) Rode <code>EXPLAIN</code> numa consulta com WHERE em coluna sem indice.<br>b) Crie o indice, rode EXPLAIN de novo e compare <code>type</code> e <code>rows</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Otimize a consulta</div>
+    <div class="box-body">A consulta abaixo esta lenta. Identifique os problemas e reescreva:<br><code>SELECT * FROM tarefas WHERE YEAR(criado_em)=2026 ORDER BY titulo;</code></div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Na sua A2</div>
+    <div class="box-body">Liste 3 consultas da sua API que merecem indice e crie-as no <code>database.sql</code>.</div>
+  </div>
+  <div class="slide-number">24 / 26</div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Mapa mental: JOINs</h1>
+  <div class="three-col">
+    <div class="box"><div class="box-title">INNER JOIN</div><div class="box-body">Intersecao. So pares completos. <em>"Tarefas COM dono."</em></div></div>
+    <div class="box"><div class="box-title">LEFT JOIN</div><div class="box-body">Toda a esquerda. NULL na direita. <em>"Todos os usuarios, com ou sem tarefa."</em></div></div>
+    <div class="box"><div class="box-title">LEFT + IS NULL</div><div class="box-body">Orfaos. <em>"Usuarios SEM tarefa."</em></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">JOIN vs Subquery</div><div class="box-body">JOIN: precisa de colunas das 2 tabelas. Subquery: filtra por algo da outra tabela sem exibi-la.</div></div>
+    <div class="box"><div class="box-title">Otimizacao</div><div class="box-body">EXPLAIN primeiro. Indice na FK e nos filtros. Cuidado: funcao na coluna e LIKE '%...' matam o indice.</div></div>
+  </div>
+  <div class="slide-number">25 / 26</div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E04</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">JOINs e Subqueries</div><div class="box-body">INNER (intersecao), LEFT (todos + NULL), RIGHT. SELF JOIN. Padrao orfao: LEFT JOIN + IS NULL. Subqueries com IN, EXISTS, e no FROM.</div></div>
+    <div class="box"><div class="box-title">Performance</div><div class="box-body">Indices B-Tree, EXPLAIN (type, key, rows), regra da esquerda em indices compostos, erros que ignoram indice.</div></div>
+  </div>
+  <div style="margin-top: 20px; text-align: center; color: #555;">
+    <p><strong>Proximo encontro:</strong> PHP 8 — Sintaxe, funcoes e introducao a POO</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">Duvidas? Fiquem a vontade para perguntar!</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">26 / 26</div>
+</div>
+
+<script>
+(function () {
+  var keywords = ['SELECT','INSERT','INTO','VALUES','UPDATE','SET','DELETE','FROM','WHERE','AND','OR','NOT','IN','BETWEEN','LIKE','IS','NULL','ORDER','BY','ASC','DESC','LIMIT','OFFSET','DISTINCT','AS','COUNT','SUM','AVG','MIN','MAX','GROUP','HAVING','START','TRANSACTION','COMMIT','ROLLBACK','USE','NOW','CREATE','DATABASE','TABLE','IF','EXISTS','CHARACTER','COLLATE','SHOW','TABLES','DATABASES','DESCRIBE','INT','BIGINT','TINYINT','DECIMAL','VARCHAR','CHAR','TEXT','JSON','ENUM','DATE','DATETIME','TIMESTAMP','AUTO_INCREMENT','PRIMARY','KEY','UNIQUE','DEFAULT','CURRENT_TIMESTAMP','ON','ENGINE','INNODB','CHARSET','ALTER','ADD','COLUMN','MODIFY','CHANGE','CONSTRAINT','FOREIGN','REFERENCES','CASCADE','RESTRICT','DROP','TRUNCATE','INDEX','JOIN','INNER','LEFT','RIGHT','OUTER','UNION','CASE','WHEN','THEN','ELSE','END','EXPLAIN','ANALYZE','YEAR','INFORMATION_SCHEMA','ROUND','TABLE_SCHEMA','DATA_LENGTH','INDEX_LENGTH'];
+  var kw = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'gi');
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var esc = pre.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var comments = [];
+    esc = esc.replace(/--[^\n]*/g, function (m) { comments.push(m); return '\u0000' + (comments.length - 1) + '\u0000'; });
+    esc = esc.replace(/'[^'\n]*'/g, function (m) { return '<span class="tok-s">' + m + '</span>'; });
+    esc = esc.replace(kw, '<span class="tok-k">$1</span>');
+    esc = esc.replace(/\u0000(\d+)\u0000/g, function (m, i) { return '<span class="tok-c">' + comments[+i] + '</span>'; });
+    pre.innerHTML = esc;
+  });
+})();
+</script>
+</body>
+</html>

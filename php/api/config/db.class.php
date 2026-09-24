@@ -6,7 +6,7 @@ class db
     private $user = 'root';
     private $password = '';
     private $port = '3306';
-    private $dbname = 'db_prog3_2026_1';
+    private $dbname = 'db_prog3_2026_2';
     private $table_name;
     private $conn; // conexão fica guardada para reutilizar
 
@@ -84,14 +84,20 @@ class db
         return $st->fetchObject();
     }
 
-    //SELECT * FROM tabela WHERE campo = valor
+    //SELECT * FROM tabela WHERE campo = valor (retorna todos os registros)
     public function findBy($campo, $valor)
     {
-        $sql = "SELECT * FROM $this->table_name WHERE $campo = ?";
+        $sql = "SELECT * FROM $this->table_name WHERE $campo LIKE ?";
         $st = $this->conn->prepare($sql);
-        $st->execute([$valor]);
+        $st->execute(["%$valor%"]);
 
-        return $st->fetchObject();
+        return $st->fetchAll(PDO::FETCH_CLASS);
+    }
+
+    // Retorna a conexao PDO para queries customizadas (JOINs)
+    public function getConn()
+    {
+        return $this->conn;
     }
 
     //UPDATE tabela SET campo1 = ?, campo2 = ? WHERE id = ?

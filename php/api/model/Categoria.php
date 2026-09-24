@@ -1,12 +1,12 @@
 <?php
 
-// model/Produto.php
+// model/Categoria.php
 require_once __DIR__ . '/../config/db.class.php';
 
-class Produto
+class Categoria
 {
     private db $db;
-    private $table_name = 'produtos';
+    private $table_name = 'categorias';
 
     public function __construct()
     {
@@ -24,12 +24,7 @@ class Produto
         return $dados ?: null;
     }
 
-    public function buscarPor(string $campo, $valor): array
-    {
-        return $this->db->findBy($campo, $valor);
-    }
-
-    public function criar($dados): void
+    public function criar(array $dados): void
     {
         $this->db->store($dados);
     }
@@ -42,5 +37,15 @@ class Produto
     public function excluir(int $id): void
     {
         $this->db->delete($id);
+    }
+
+    // Relacionamento 1:N — lista todos os produtos de uma categoria
+    public function listarProdutos(int $categoriaId): array
+    {
+        $sql = "SELECT * FROM produtos WHERE categoria_id = ?";
+        $stmt = $this->db->getConn()->prepare($sql);
+        $stmt->execute([$categoriaId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

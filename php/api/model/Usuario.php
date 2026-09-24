@@ -1,12 +1,12 @@
 <?php
 
-// model/Produto.php
+// model/Usuario.php
 require_once __DIR__ . '/../config/db.class.php';
 
-class Produto
+class Usuario
 {
     private db $db;
-    private $table_name = 'produtos';
+    private $table_name = 'usuario';
 
     public function __construct()
     {
@@ -24,12 +24,13 @@ class Produto
         return $dados ?: null;
     }
 
-    public function buscarPor(string $campo, $valor): array
+    public function buscarPorEmail(string $email): ?object
     {
-        return $this->db->findBy($campo, $valor);
+        $dados = $this->db->findBy('email', $email);
+        return $dados[0] ?? null;
     }
 
-    public function criar($dados): void
+    public function criar(array $dados): void
     {
         $this->db->store($dados);
     }

@@ -1,27 +1,32 @@
 <?php
 
-// view/produto_json.php
+// view/categoria_json.php
 // Responsavel apenas por formatar e exibir as respostas em JSON.
 
 require_once __DIR__ . '/../controller/Controller.php';
 
-class ProdutoJsonView extends Controller
+class CategoriaJsonView extends Controller
 {
-    public function renderListar(array $produtos): void
+    public function renderListar(array $categorias): void
     {
-        $this->resposta(['sucesso' => true, 'dados' => $produtos]);
+        $this->resposta(['sucesso' => true, 'dados' => $categorias]);
     }
 
-    public function renderBuscar(object $produto): void
+    public function renderBuscar(object $categoria): void
     {
-        $this->resposta(['sucesso' => true, 'dados' => $produto]);
+        $this->resposta(['sucesso' => true, 'dados' => $categoria]);
+    }
+
+    public function renderListarProdutos(array $produtos): void
+    {
+        $this->resposta(['sucesso' => true, 'dados' => $produtos]);
     }
 
     public function renderCriar(): void
     {
         $this->resposta([
             'sucesso' => true,
-            'mensagem' => 'Produto criado com sucesso',
+            'mensagem' => 'Categoria criada com sucesso',
         ], 201);
     }
 
@@ -29,7 +34,7 @@ class ProdutoJsonView extends Controller
     {
         $this->resposta([
             'sucesso' => true,
-            'mensagem' => 'Produto atualizado com sucesso',
+            'mensagem' => 'Categoria atualizada com sucesso',
         ]);
     }
 
@@ -37,7 +42,7 @@ class ProdutoJsonView extends Controller
     {
         $this->resposta([
             'sucesso' => true,
-            'mensagem' => 'Produto excluido com sucesso',
+            'mensagem' => 'Categoria excluida com sucesso',
         ]);
     }
 

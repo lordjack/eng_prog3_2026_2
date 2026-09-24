@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E05 - Introducao ao PHP 8: Sintaxe, Controle e Funcoes</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+pre .tok-v { color: #fca5a5; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E05</h1>
+    <div class="subtitle">PHP 8 — Sintaxe, Controle de Fluxo e Funcoes</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: Sintaxe, Variaveis e Lacos</span>
+      <span class="tag tag-green">Aulas 3-4: Funcoes, Arrays e Formularios</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 25</div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E05</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">Sintaxe basica, variaveis, tipos, operadores e estruturas condicionais. <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">Lacos de repeticao: for, while, do-while, foreach. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">Funcoes e arrays (indexados e associativos). <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (70 min)</div><div class="box-body">Manipulacao de strings, formularios HTML e metodos GET/POST. <strong>Exercicio final + duvidas.</strong></div></div>
+  <div class="slide-number">2 / 25</div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide">
+  <div class="aula-tag">Revisao</div>
+  <h1>De onde viemos, para onde vamos</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">O que ja sabemos (E02-E04)</div><div class="box-body">Modelar o banco, criar tabelas com DDL, manipular dados com DML e consultar com JOINs, subqueries e indices.</div></div>
+    <div class="box"><div class="box-title">O que falta</div><div class="box-body">Como o site/app conversa com o banco. A resposta e uma linguagem de <strong>backend</strong>: o PHP.</div></div>
+  </div>
+  <h2>Onde o PHP entra no projeto (A2)</h2>
+  <pre>Navegador (HTML/JS)  --HTTP-->  PHP (backend)  --SQL-->  MySQL
+     requisicao                processa e valida         guarda os dados
+     resposta     <--JSON---   monta a resposta   <--    devolve os dados</pre>
+  <p><span class="tag tag-purple">A2</span> Toda a logica da sua API REST sera escrita em PHP.</p>
+  <div class="slide-number">3 / 25</div>
+</div>
+
+<!-- AULA 1 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>PHP 8 — Primeiros Passos</h1>
+  <div class="sub">Sintaxe, variaveis, tipos e operadores</div>
+  <div class="slide-number">4 / 25</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>O que e PHP e como ele roda?</h1>
+  <p><strong>PHP</strong> (PHP: Hypertext Preprocessor) e uma linguagem de script executada no <strong>servidor</strong>. O navegador so recebe o resultado (HTML/JSON), nunca o codigo PHP.</p>
+  <pre>&lt;?php
+// Tudo entre as tags abaixo e interpretado pelo PHP
+echo "Ola, Programacao III!";
+?&gt;
+
+&lt;?php
+// Um arquivo pode misturar PHP com HTML
+if (true) {
+    echo "&lt;p&gt;Isso vira HTML de verdade&lt;/p&gt;";
+}</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">echo / print</div><div class="box-body">Enviam texto para a saida (tela do navegador).</div></div>
+    <div class="box"><div class="box-title">Comentarios</div><div class="box-body"><code>// linha</code>, <code># linha</code>, <code>/* bloco */</code></div></div>
+  </div>
+  <div class="slide-number">5 / 25</div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Variaveis e tipos de dados</h1>
+  <pre>$nome       = "Ana Silva";        // string
+$idade      = 21;                 // int
+$altura     = 1.68;                // float
+$ativo      = true;                // bool
+$endereco   = null;                 // null
+$notas      = [8.5, 7.0, 9.2];      // array
+
+var_dump($idade);   // int(21)  -- mostra tipo + valor
+echo gettype($ativo); // boolean</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Regras de nome</div><div class="box-body">Comeca com <code>$</code>, depois letra ou <code>_</code>. Case-sensitive: <code>$Nome</code> != <code>$nome</code>.</div></div>
+    <div class="box"><div class="box-title">Tipagem dinamica</div><div class="box-body">O tipo e definido em tempo de execucao e pode mudar. PHP 8 permite <em>type hints</em> para forcar tipos.</div></div>
+  </div>
+  <div class="slide-number">6 / 25</div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Operadores</h1>
+  <div class="two-col">
+    <div>
+      <h2>Aritmeticos e atribuicao</h2>
+      <pre>$a = 10; $b = 3;
+$a + $b;   // 13
+$a % $b;   // 1  (resto)
+$a ** $b;  // 1000 (potencia)
+$a += 5;   // $a = $a + 5
+$a++;      // incrementa 1</pre>
+      <h2>Concatenacao (string)</h2>
+      <pre>$nome = "Ana";
+echo "Ola, " . $nome . "!";   // ponto concatena
+$msg = "Bem-vindo, ";
+$msg .= $nome;                 // concatena e atribui</pre>
+    </div>
+    <div>
+      <h2>Comparacao</h2>
+      <pre>5 == "5"    // true  (so valor)
+5 === "5"   // false (valor + tipo)
+5 != "5"    // false
+5 !== "5"   // true
+$a &lt;=&gt; $b   // spaceship: -1, 0 ou 1</pre>
+      <h2>Logicos</h2>
+      <pre>$idade &gt;= 18 &amp;&amp; $ativo
+$status == 'a' || $status == 'p'
+!$ativo</pre>
+      <div class="warn" style="margin-top:6px;"><div class="warn-title">Use === , nao ==</div><div class="box-body">Evita bugs sutis de comparacao de tipos diferentes.</div></div>
+    </div>
+  </div>
+  <div class="slide-number">7 / 25</div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Estruturas condicionais</h1>
+  <pre>if ($idade &gt;= 18) {
+    echo "Maior de idade";
+} elseif ($idade &gt;= 12) {
+    echo "Adolescente";
+} else {
+    echo "Crianca";
+}
+
+// match (PHP 8): mais enxuto que switch, compara com ===
+$status = 'pendente';
+$cor = match($status) {
+    'pendente'     =&gt; 'amarelo',
+    'em_andamento' =&gt; 'azul',
+    'concluida'    =&gt; 'verde',
+    default        =&gt; 'cinza',
+};</pre>
+  <p><span class="tag tag-green">Novidade PHP 8</span> <code>match</code> nao precisa de <code>break</code> e compara com <code>===</code> (sem coercao de tipo).</p>
+  <div class="slide-number">8 / 25</div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Variaveis e operadores</div>
+    <div class="box-body">Crie variaveis para nome, idade e uma nota. Calcule a media de 3 notas e exiba com <code>echo</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Condicionais</div>
+    <div class="box-body">a) Escreva um script que classifica uma nota em "Aprovado" (&gt;= 6) ou "Reprovado".<br>b) Use <code>match</code> para converter um numero de 1 a 7 no nome do dia da semana.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Comparacao</div>
+    <div class="box-body">Teste <code>var_dump(0 == "abc")</code> em PHP 8 e explique o resultado com a dupla.</div>
+  </div>
+  <div class="slide-number">9 / 25</div>
+</div>
+
+<!-- AULA 2 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Lacos de Repeticao</h1>
+  <div class="sub">for, while, do-while e foreach</div>
+  <div class="slide-number">10 / 25</div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>for e while</h1>
+  <pre>// for: quando sabemos QUANTAS vezes repetir
+for ($i = 1; $i &lt;= 5; $i++) {
+    echo "Volta $i&lt;br&gt;";
+}
+
+// while: repete ENQUANTO a condicao for verdadeira
+$contador = 0;
+while ($contador &lt; 5) {
+    echo "Contador: $contador&lt;br&gt;";
+    $contador++;
+}</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">for</div><div class="box-body">Ideal para percorrer indices ou repetir N vezes.</div></div>
+    <div class="box"><div class="box-title">while</div><div class="box-body">Ideal quando o numero de repeticoes depende de uma condicao.</div></div>
+  </div>
+  <div class="slide-number">11 / 25</div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>do-while e foreach</h1>
+  <pre>// do-while: executa PELO MENOS uma vez
+$senha = "";
+do {
+    $senha = "1234"; // aqui viria a leitura real
+} while ($senha === "");
+
+// foreach: percorre arrays sem controlar indice manualmente
+$notas = [8.5, 7.0, 9.2];
+foreach ($notas as $nota) {
+    echo "Nota: $nota&lt;br&gt;";
+}
+
+foreach ($notas as $indice =&gt; $nota) {
+    echo "Posicao $indice = $nota&lt;br&gt;";
+}</pre>
+  <p><span class="tag tag-gray">Dica</span> Para arrays, <code>foreach</code> e sempre mais legivel que <code>for</code>.</p>
+  <div class="slide-number">12 / 25</div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>break, continue e lacos aninhados</h1>
+  <pre>// break: interrompe o laco imediatamente
+foreach ($notas as $nota) {
+    if ($nota &lt; 0) break;
+    echo $nota . "&lt;br&gt;";
+}
+
+// continue: pula para a proxima iteracao
+for ($i = 1; $i &lt;= 10; $i++) {
+    if ($i % 2 == 0) continue; // pula os pares
+    echo $i . " ";
+}
+
+// Laco aninhado: tabuada de 1 a 3
+for ($i = 1; $i &lt;= 3; $i++) {
+    for ($j = 1; $j &lt;= 10; $j++) {
+        echo "$i x $j = " . ($i * $j) . "&lt;br&gt;";
+    }
+}</pre>
+  <div class="slide-number">13 / 25</div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. For e while</div>
+    <div class="box-body">a) Imprima os numeros pares de 1 a 20 (for).<br>b) Some os numeros de 1 a 100 usando while e exiba o total.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Foreach</div>
+    <div class="box-body">Dado <code>$tarefas = ["Estudar SQL", "Fazer API", "Revisar BD"];</code>, imprima cada tarefa numerada (1. Estudar SQL, 2. ...).</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Desafio</div>
+    <div class="box-body">Imprima a tabuada completa de um numero escolhido, usando <code>continue</code> para pular o resultado da multiplicacao por 5.</div>
+  </div>
+  <div class="slide-number">14 / 25</div>
+</div>
+
+<!-- AULA 3 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Funcoes e Arrays</h1>
+  <div class="sub">Organizando e agrupando dados</div>
+  <div class="slide-number">15 / 25</div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Funcoes — definindo e reutilizando</h1>
+  <pre>function saudacao($nome) {
+    return "Ola, $nome!";
+}
+echo saudacao("Bruno"); // Ola, Bruno!
+
+// Parametro com valor padrao
+function calcularMedia($n1, $n2, $n3 = 0) {
+    return ($n1 + $n2 + $n3) / 3;
+}
+
+// Tipagem (PHP 8): parametros e retorno tipados
+function somar(int $a, int $b): int {
+    return $a + $b;
+}</pre>
+  <p><span class="tag tag-green">Boa pratica</span> Tipar parametros e retorno evita bugs e documenta a funcao.</p>
+  <div class="slide-number">16 / 25</div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Arrays indexados e associativos</h1>
+  <pre>// Indexado: posicoes numericas 0, 1, 2...
+$frutas = ["maca", "banana", "uva"];
+echo $frutas[1]; // banana
+
+// Associativo: chaves nomeadas (como um "dicionario")
+$usuario = [
+    "nome"  =&gt; "Ana Silva",
+    "email" =&gt; "ana@email.com",
+    "ativo" =&gt; true
+];
+echo $usuario["nome"]; // Ana Silva
+
+// Array multidimensional (parecido com resultado de SELECT!)
+$usuarios = [
+    ["id" =&gt; 1, "nome" =&gt; "Ana"],
+    ["id" =&gt; 2, "nome" =&gt; "Bruno"],
+];
+echo $usuarios[0]["nome"]; // Ana</pre>
+  <div class="slide-number">17 / 25</div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Funcoes prontas para arrays</h1>
+  <table>
+    <tr><th>Funcao</th><th>O que faz</th><th>Exemplo</th></tr>
+    <tr><td><code>count()</code></td><td>Total de itens</td><td><code>count($frutas)</code> → 3</td></tr>
+    <tr><td><code>in_array()</code></td><td>Verifica se existe</td><td><code>in_array("uva", $frutas)</code> → true</td></tr>
+    <tr><td><code>array_search()</code></td><td>Acha a posicao/chave</td><td><code>array_search("uva", $frutas)</code> → 2</td></tr>
+    <tr><td><code>array_map()</code></td><td>Aplica funcao a cada item</td><td>Dobrar todas as notas</td></tr>
+    <tr><td><code>array_filter()</code></td><td>Filtra por condicao</td><td>So notas &gt;= 7</td></tr>
+    <tr><td><code>sort() / asort()</code></td><td>Ordena valores</td><td>Ordem crescente</td></tr>
+  </table>
+  <pre>$notas = [8.5, 5.0, 9.2, 6.0];
+$dobradas = array_map(fn($n) =&gt; $n * 2, $notas);
+$aprovadas = array_filter($notas, fn($n) =&gt; $n &gt;= 7);
+print_r($aprovadas); // [0 =&gt; 8.5, 2 =&gt; 9.2]</pre>
+  <div class="slide-number">18 / 25</div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Funcoes</div>
+    <div class="box-body">Crie uma funcao <code>media(array $notas): float</code> que recebe um array de notas e retorna a media.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Arrays</div>
+    <div class="box-body">Monte um array associativo para um "produto" (nome, preco, estoque) e outro array com 3 produtos (multidimensional). Imprima com <code>foreach</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Funcoes de array</div>
+    <div class="box-body">Do array de produtos, use <code>array_filter</code> para listar so os produtos com estoque &gt; 0.</div>
+  </div>
+  <div class="slide-number">19 / 25</div>
+</div>
+
+<!-- AULA 4 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Strings e Formularios</h1>
+  <div class="sub">Do texto ao envio via GET/POST</div>
+  <div class="slide-number">20 / 25</div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Manipulacao de strings</h1>
+  <table>
+    <tr><th>Funcao</th><th>O que faz</th><th>Exemplo</th></tr>
+    <tr><td><code>strlen()</code></td><td>Tamanho da string</td><td><code>strlen("Ana")</code> → 3</td></tr>
+    <tr><td><code>strtoupper/lower()</code></td><td>Maiuscula/minuscula</td><td><code>strtoupper("ana")</code> → ANA</td></tr>
+    <tr><td><code>trim()</code></td><td>Remove espacos das pontas</td><td><code>trim(" ana ")</code> → "ana"</td></tr>
+    <tr><td><code>str_replace()</code></td><td>Substitui trecho</td><td>Trocar "-" por "/"</td></tr>
+    <tr><td><code>substr()</code></td><td>Recorta parte do texto</td><td><code>substr("Programacao",0,4)</code> → "Prog"</td></tr>
+    <tr><td><code>explode() / implode()</code></td><td>String ↔ array</td><td>Separar CSV por virgula</td></tr>
+  </table>
+  <pre>$nome = "  ana SILVA  ";
+$limpo = trim($nome);              // "ana SILVA"
+$formatado = ucwords(strtolower($limpo)); // "Ana Silva"
+$partes = explode(" ", $formatado); // ["Ana", "Silva"]
+echo implode("-", $partes);         // "Ana-Silva"</pre>
+  <div class="slide-number">21 / 25</div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Formularios HTML: GET vs POST</h1>
+  <pre>&lt;form action="processa.php" method="GET"&gt;
+    &lt;input type="text" name="busca"&gt;
+    &lt;button type="submit"&gt;Buscar&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;form action="cadastro.php" method="POST"&gt;
+    &lt;input type="text" name="nome"&gt;
+    &lt;input type="email" name="email"&gt;
+    &lt;button type="submit"&gt;Cadastrar&lt;/button&gt;
+&lt;/form&gt;</pre>
+  <table>
+    <tr><th>Metodo</th><th>Onde vao os dados</th><th>Quando usar</th></tr>
+    <tr><td><code>GET</code></td><td>Na URL (visivel): <code>?busca=sql</code></td><td>Buscas, filtros, paginacao</td></tr>
+    <tr><td><code>POST</code></td><td>No corpo da requisicao (oculto)</td><td>Cadastro, login, senhas, uploads</td></tr>
+  </table>
+  <div class="slide-number">22 / 25</div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Superglobais $_GET, $_POST e validacao</h1>
+  <pre>// processa.php — recebendo dados do GET
+$busca = $_GET['busca'] ?? '';   // ?? evita erro se nao existir
+echo "Voce buscou por: " . htmlspecialchars($busca);
+
+// cadastro.php — recebendo dados do POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nome  = trim($_POST['nome'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+
+    if ($nome === '' || $email === '') {
+        echo "Preencha todos os campos!";
+    } else {
+        echo "Cadastrado: $nome ($email)";
+    }
+}</pre>
+  <div class="warn"><div class="warn-title">Nunca confie no usuario</div><div class="box-body">Sempre valide e use <code>htmlspecialchars()</code> antes de exibir dados recebidos — protege contra XSS.</div></div>
+  <div class="slide-number">23 / 25</div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Strings</div>
+    <div class="box-body">Receba um nome completo e exiba: nome em maiusculas, quantidade de caracteres e apenas o primeiro nome (com <code>explode</code>).</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Formulario GET</div>
+    <div class="box-body">Crie um formulario de busca (GET) e um <code>processa.php</code> que exibe o termo buscado, validando se o campo veio vazio.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Formulario POST</div>
+    <div class="box-body">Crie um formulario de cadastro (nome, email, senha) via POST que valida os campos obrigatorios antes de exibir o resultado.</div>
+  </div>
+  <div class="slide-number">24 / 25</div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E05</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Fundamentos</div><div class="box-body">Sintaxe, variaveis, tipos, operadores, if/elseif/else, match. Lacos for, while, do-while, foreach, break/continue.</div></div>
+    <div class="box"><div class="box-title">Funcoes e Web</div><div class="box-body">Funcoes com tipagem, arrays indexados/associativos, funcoes de array. Strings, formularios GET/POST, superglobais e validacao basica.</div></div>
+  </div>
+  <div style="margin-top: 20px; text-align: center; color: #555;">
+    <p><strong>Proximo encontro:</strong> PHP + MySQL — Conexao com PDO e CRUD completo</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">Duvidas? Fiquem a vontade para perguntar!</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">25 / 25</div>
+</div>
+
+<script>
+(function () {
+  var keywords = ['echo','print','if','elseif','else','match','default','for','foreach','while','do','break','continue','function','return','true','false','null','array','int','float','string','bool','var_dump','gettype','print_r','count','in_array','array_search','array_map','array_filter','sort','asort','strlen','strtoupper','strtolower','trim','str_replace','substr','explode','implode','ucwords','htmlspecialchars','REQUEST_METHOD','POST','GET','fn','as'];
+  var kw = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'g');
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var esc = pre.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var comments = [];
+    esc = esc.replace(/\/\/[^\n]*/g, function (m) { comments.push(m); return '\u0000' + (comments.length - 1) + '\u0000'; });
+    esc = esc.replace(/"[^"\n]*"/g, function (m) { return '<span class="tok-s">' + m + '</span>'; });
+    esc = esc.replace(/\$[a-zA-Z_][a-zA-Z0-9_]*/g, function (m) { return '<span class="tok-v">' + m + '</span>'; });
+    esc = esc.replace(kw, '<span class="tok-k">$1</span>');
+    esc = esc.replace(/\u0000(\d+)\u0000/g, function (m, i) { return '<span class="tok-c">' + comments[+i] + '</span>'; });
+    pre.innerHTML = esc;
+  });
+})();
+</script>
+</body>
+</html>

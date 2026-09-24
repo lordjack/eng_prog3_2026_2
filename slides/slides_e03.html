@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E03 - SQL DML: INSERT, UPDATE, DELETE, SELECT e Agregacao</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E03</h1>
+    <div class="subtitle">SQL — DML: Manipulacao e Consulta de Dados</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: INSERT, UPDATE, DELETE</span>
+      <span class="tag tag-green">Aulas 3-4: SELECT + Agregacao</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 27</div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E03</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">INSERT (simples, multiplo, SELECT). <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">UPDATE e DELETE com seguranca. Transacoes. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">SELECT, WHERE, ORDER BY, LIMIT, DISTINCT. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (70 min)</div><div class="box-body">Funcoes de agregacao, GROUP BY, HAVING. <strong>Exercicio final + duvidas.</strong></div></div>
+  <div class="slide-number">2 / 27</div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide">
+  <div class="aula-tag">Revisao</div>
+  <h1>Revisao rapida do E02</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">DDL (estrutura)</div><div class="box-body"><code>CREATE TABLE</code>, <code>ALTER TABLE</code>, <code>DROP TABLE</code>. Define o esqueleto do banco.</div></div>
+    <div class="box"><div class="box-title">DML (dados) — hoje!</div><div class="box-body"><code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>SELECT</code>. Manipula o conteudo das tabelas.</div></div>
+  </div>
+  <h2>Banco de exemplo do dia</h2>
+  <pre>USE taskmanager;
+
+-- Tabelas que criamos no E02:
+-- usuarios (id_usuario, nome, email, senha_hash, ativo, criado_em)
+-- tarefas  (id_tarefa, titulo, descricao, status, prioridade, id_usuario)</pre>
+  <p><span class="tag tag-gray">Dica</span> Rode o script <code>database.sql</code> do E02 antes de comecar os exercicios.</p>
+  <div class="slide-number">3 / 27</div>
+</div>
+
+<!-- AULA 1 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INSERT — Inserindo Dados</h1>
+  <div class="sub">Do banco vazio ao banco populado</div>
+  <div class="slide-number">4 / 27</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INSERT — sintaxe basica</h1>
+  <pre>-- Forma 1: especificando colunas (recomendada)
+INSERT INTO usuarios (nome, email, senha_hash)
+VALUES ('Ana Silva', 'ana@email.com', 'hash_da_senha');
+
+-- Forma 2: todas as colunas na ordem (fragil!)
+INSERT INTO usuarios
+VALUES (NULL, 'Bruno Souza', 'bruno@email.com', 'hash', 1, NOW(), NOW());</pre>
+  <div class="warn"><div class="warn-title">Sempre liste as colunas</div><div class="box-body">A forma 2 quebra se a tabela mudar. Com colunas explicitas, o INSERT sobrevive a ALTER TABLE.</div></div>
+  <p><span class="tag tag-green">Retorno</span> O MySQL responde: <code>Query OK, 1 row affected</code></p>
+  <div class="slide-number">5 / 27</div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INSERT multiplo e INSERT ... SELECT</h1>
+  <h2>Varios registros de uma vez (mais rapido!)</h2>
+  <pre>INSERT INTO usuarios (nome, email, senha_hash) VALUES
+    ('Carla Dias',  'carla@email.com',  'hash1'),
+    ('Diego Lima',  'diego@email.com',  'hash2'),
+    ('Elena Rocha', 'elena@email.com',  'hash3');</pre>
+  <h2>Copiando dados de outra tabela</h2>
+  <pre>INSERT INTO usuarios_backup (nome, email)
+SELECT nome, email FROM usuarios WHERE ativo = 0;</pre>
+  <p><span class="tag tag-gray">Dica</span> INSERT multiplo e ate 10x mais rapido que varios INSERTs individuais.</p>
+  <div class="slide-number">6 / 27</div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>INSERT com FK e erros comuns</h1>
+  <pre>-- Correto: o usuario 1 existe
+INSERT INTO tarefas (titulo, descricao, prioridade, id_usuario)
+VALUES ('Estudar SQL', 'Resolver os exercicios do E03', 'alta', 1);
+
+-- ERRO 1452: usuario 99 nao existe!
+INSERT INTO tarefas (titulo, id_usuario) VALUES ('Tarefa orfa', 99);
+-- Cannot add or update a child row: a foreign key constraint fails</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Erro 1062 — Duplicate entry</div><div class="box-body">Violou UNIQUE ou PRIMARY KEY. Ex: email ja cadastrado.</div></div>
+    <div class="box"><div class="box-title">Erro 1048 — Cannot be null</div><div class="box-body">Esqueceu coluna NOT NULL sem DEFAULT.</div></div>
+  </div>
+  <div class="slide-number">7 / 27</div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Popule o banco</div>
+    <div class="box-body">Insira <strong>4 usuarios</strong> (1 a 1, depois 3 com INSERT multiplo) e <strong>6 tarefas</strong> distribuidas entre eles, com status e prioridades variados.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Provoque erros (de proposito!)</div>
+    <div class="box-body">a) Insira um email duplicado e observe o erro 1062.<br>b) Insira uma tarefa com <code>id_usuario = 999</code> e observe o erro 1452.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Verifique</div>
+    <div class="box-body">Confira com <code>SELECT * FROM usuarios;</code> e <code>SELECT * FROM tarefas;</code></div>
+  </div>
+  <div class="slide-number">8 / 27</div>
+</div>
+
+<!-- AULA 2 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>UPDATE e DELETE</h1>
+  <div class="sub">Alterando e removendo com seguranca</div>
+  <div class="slide-number">9 / 27</div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>UPDATE — alterando registros</h1>
+  <pre>-- Atualiza UM registro (com WHERE na PK)
+UPDATE tarefas
+SET status = 'concluida'
+WHERE id_tarefa = 3;
+
+-- Atualiza VARIOS registros de uma vez
+UPDATE tarefas
+SET prioridade = 'alta'
+WHERE id_usuario = 1 AND status = 'pendente';
+
+-- Atualizacao calculada
+UPDATE produtos SET preco = preco * 1.10 WHERE id_cat = 2;</pre>
+  <div class="warn"><div class="warn-title">NUNCA esqueca o WHERE!</div><div class="box-body"><code>UPDATE tarefas SET status='concluida';</code> marca TODAS as tarefas como concluidas. Sem WHERE = desastre.</div></div>
+  <div class="slide-number">10 / 27</div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>DELETE — removendo registros</h1>
+  <pre>-- Remove UM registro
+DELETE FROM tarefas WHERE id_tarefa = 5;
+
+-- Remove por condicao
+DELETE FROM tarefas WHERE status = 'concluida';
+
+-- DELETE vs TRUNCATE
+DELETE FROM tarefas;    -- linha a linha, pode dar ROLLBACK
+TRUNCATE TABLE tarefas; -- recria a tabela, mais rapido, sem rollback</pre>
+  <div class="warn"><div class="warn-title">Efeito do CASCADE</div><div class="box-body"><code>DELETE FROM usuarios WHERE id_usuario = 1;</code> apaga tambem TODAS as tarefas dele (ON DELETE CASCADE). Sempre confira o impacto antes!</div></div>
+  <div class="slide-number">11 / 27</div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Seguranca: teste antes com SELECT</h1>
+  <h2>Padrao de ouro: SELECT -> DML</h2>
+  <pre>-- 1. Veja O QUE sera afetado
+SELECT * FROM tarefas WHERE status = 'concluida';
+
+-- 2. Confira a quantidade
+SELECT COUNT(*) FROM tarefas WHERE status = 'concluida';
+
+-- 3. So entao execute o DELETE com a MESMA condicao
+DELETE FROM tarefas WHERE status = 'concluida';</pre>
+  <div class="box"><div class="box-title">MySQL Workbench — Safe Updates</div><div class="box-body">Por padrao, o Workbench bloqueia UPDATE/DELETE sem WHERE na PK (erro 1175). Isso e seu amigo, nao seu inimigo!</div></div>
+  <div class="slide-number">12 / 27</div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Transacoes: seu botao de "desfazer"</h1>
+  <pre>START TRANSACTION;
+
+UPDATE usuarios SET ativo = 0 WHERE id_usuario = 2;
+DELETE FROM tarefas WHERE id_usuario = 2;
+
+-- Algo errado? Desfaz TUDO:
+ROLLBACK;
+
+-- Tudo certo? Confirma TUDO:
+-- COMMIT;</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">COMMIT</div><div class="box-body">Confirma as alteracoes definitivamente.</div></div>
+    <div class="box"><div class="box-title">ROLLBACK</div><div class="box-body">Desfaz tudo desde o START TRANSACTION.</div></div>
+  </div>
+  <p><span class="tag tag-red">Lembrete</span> DDL (CREATE/ALTER/DROP) ignora transacao — so DML pode ser desfeito.</p>
+  <div class="slide-number">13 / 27</div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. UPDATE seguro</div>
+    <div class="box-body">a) Marque 2 tarefas como 'concluida'.<br>b) Aumente a prioridade de todas as tarefas pendentes do usuario 1.<br>c) Antes de cada UPDATE, rode o SELECT equivalente.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. DELETE com transacao</div>
+    <div class="box-body">Inicie uma transacao, delete um usuario, confira o CASCADE nas tarefas com SELECT, e faca ROLLBACK para recuperar tudo.</div>
+  </div>
+  <div class="slide-number">14 / 27</div>
+</div>
+
+<!-- AULA 3 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>SELECT — Consultando Dados</h1>
+  <div class="sub">WHERE, ORDER BY, LIMIT, DISTINCT</div>
+  <div class="slide-number">15 / 27</div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>SELECT — anatomia da consulta</h1>
+  <pre>SELECT coluna1, coluna2        -- O QUE voce quer ver
+FROM tabela                    -- DE ONDE vem
+WHERE condicao                 -- FILTRO de linhas
+ORDER BY coluna DESC           -- ORDENACAO
+LIMIT 10;                      -- QUANTAS linhas</pre>
+  <h2>Exemplos basicos</h2>
+  <pre>SELECT * FROM usuarios;                       -- tudo
+SELECT nome, email FROM usuarios;             -- colunas
+SELECT nome FROM usuarios WHERE ativo = 1;    -- filtro
+SELECT titulo FROM tarefas ORDER BY criado_em DESC LIMIT 5;</pre>
+  <p><span class="tag tag-gray">Dica</span> Evite <code>SELECT *</code> em producao — liste so o que precisa.</p>
+  <div class="slide-number">16 / 27</div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>WHERE — operadores de filtro</h1>
+  <div class="two-col">
+    <div>
+      <h2>Comparacao e logica</h2>
+      <pre>WHERE status = 'pendente'
+WHERE prioridade <> 'baixa'
+WHERE id_usuario = 1 AND status = 'pendente'
+WHERE status = 'pendente' OR status = 'em_andamento'</pre>
+      <h2>Intervalos e listas</h2>
+      <pre>WHERE id_tarefa BETWEEN 5 AND 10
+WHERE prioridade IN ('alta','media')
+WHERE id_usuario NOT IN (1, 2)</pre>
+    </div>
+    <div>
+      <h2>Texto e nulos</h2>
+      <pre>WHERE titulo LIKE '%SQL%'     -- contem
+WHERE email LIKE 'ana%'       -- comeca
+WHERE descricao IS NULL       -- e nulo
+WHERE descricao IS NOT NULL   -- tem valor</pre>
+      <div class="warn" style="margin-top:6px;"><div class="warn-title">NULL != vazio</div><div class="box-body">NULL se compara com IS, nunca com = . <code>= NULL</code> sempre retorna falso!</div></div>
+    </div>
+  </div>
+  <div class="slide-number">17 / 27</div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>ORDER BY, DISTINCT e LIMIT</h1>
+  <h2>Ordenacao</h2>
+  <pre>SELECT titulo, prioridade FROM tarefas
+ORDER BY prioridade ASC, criado_em DESC;  -- multiplas colunas</pre>
+  <h2>Valores unicos</h2>
+  <pre>SELECT DISTINCT status FROM tarefas;      -- 3 linhas, sem repeticao
+SELECT DISTINCT id_usuario FROM tarefas;  -- quem tem tarefa?</pre>
+  <h2>Paginacao (essencial para APIs!)</h2>
+  <pre>SELECT * FROM tarefas ORDER BY id_tarefa LIMIT 10 OFFSET 20;  -- pagina 3</pre>
+  <p><span class="tag tag-purple">A2</span> Voce vai usar <code>LIMIT/OFFSET</code> na paginacao da sua API REST.</p>
+  <div class="slide-number">18 / 27</div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">Consultas para resolver</div>
+    <div class="box-body">
+      1. Liste nome e email dos usuarios ativos, em ordem alfabetica.<br>
+      2. Liste as tarefas pendentes de prioridade alta.<br>
+      3. Liste as tarefas cujo titulo contem "SQL".<br>
+      4. Liste as 3 tarefas mais recentes.<br>
+      5. Liste os status distintos existentes na tabela tarefas.<br>
+      6. Liste tarefas sem descricao (dica: IS NULL).
+    </div>
+  </div>
+  <p><span class="tag tag-gray">Desafio</span> Combine 3 condicoes: pendentes OU em andamento, do usuario 1, ordenadas por prioridade.</p>
+  <div class="slide-number">19 / 27</div>
+</div>
+
+<!-- AULA 4 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Agregacao e GROUP BY</h1>
+  <div class="sub">COUNT, SUM, AVG, MIN, MAX + HAVING</div>
+  <div class="slide-number">20 / 27</div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Funcoes de agregacao</h1>
+  <pre>SELECT COUNT(*)        AS total_tarefas,
+       COUNT(descricao) AS com_descricao   -- ignora NULLs!
+FROM tarefas;</pre>
+  <table>
+    <tr><th>Funcao</th><th>O que faz</th><th>Exemplo</th></tr>
+    <tr><td><code>COUNT(*)</code></td><td>Conta linhas</td><td>Total de usuarios</td></tr>
+    <tr><td><code>COUNT(col)</code></td><td>Conta nao-nulos</td><td>Tarefas com descricao</td></tr>
+    <tr><td><code>SUM(col)</code></td><td>Soma valores</td><td>Total vendido</td></tr>
+    <tr><td><code>AVG(col)</code></td><td>Media</td><td>Preco medio</td></tr>
+    <tr><td><code>MIN/MAX(col)</code></td><td>Menor/Maior</td><td>Tarefa mais antiga</td></tr>
+  </table>
+  <p><span class="tag tag-gray">Alias</span> Use <code>AS nome</code> para nomear o resultado — vira o nome da coluna no PHP!</p>
+  <div class="slide-number">21 / 27</div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>GROUP BY — agrupando resultados</h1>
+  <h2>Quantas tarefas por status?</h2>
+  <pre>SELECT status, COUNT(*) AS total
+FROM tarefas
+GROUP BY status;</pre>
+  <table style="width:60%;">
+    <tr><th>status</th><th>total</th></tr>
+    <tr><td>pendente</td><td>3</td></tr>
+    <tr><td>em_andamento</td><td>2</td></tr>
+    <tr><td>concluida</td><td>1</td></tr>
+  </table>
+  <h2>Quantas tarefas por usuario?</h2>
+  <pre>SELECT id_usuario, COUNT(*) AS total
+FROM tarefas
+GROUP BY id_usuario
+ORDER BY total DESC;</pre>
+  <div class="slide-number">22 / 27</div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>HAVING — filtrando os grupos</h1>
+  <p><code>WHERE</code> filtra <strong>linhas antes</strong> de agrupar. <code>HAVING</code> filtra <strong>grupos depois</strong> de agregar.</p>
+  <pre>-- Usuarios com MAIS de 2 tarefas
+SELECT id_usuario, COUNT(*) AS total
+FROM tarefas
+GROUP BY id_usuario
+HAVING total > 2;
+
+-- WHERE + HAVING juntos
+SELECT id_usuario, COUNT(*) AS pendentes
+FROM tarefas
+WHERE status = 'pendente'      -- 1o: filtra linhas
+GROUP BY id_usuario            -- 2o: agrupa
+HAVING pendentes >= 2;         -- 3o: filtra grupos</pre>
+  <div class="warn"><div class="warn-title">Erro classico</div><div class="box-body"><code>WHERE COUNT(*) > 2</code> nao existe! Funcao de agregacao so no HAVING.</div></div>
+  <div class="slide-number">23 / 27</div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Ordem logica do SELECT</h1>
+  <p>O SQL executa as clausulas nesta ordem (nao na ordem que voce escreve!):</p>
+  <table>
+    <tr><th>#</th><th>Clausula</th><th>O que faz</th></tr>
+    <tr><td>1</td><td><code>FROM</code></td><td>Define a(s) tabela(s) de origem</td></tr>
+    <tr><td>2</td><td><code>WHERE</code></td><td>Filtra linhas individuais</td></tr>
+    <tr><td>3</td><td><code>GROUP BY</code></td><td>Agrupa as linhas restantes</td></tr>
+    <tr><td>4</td><td><code>HAVING</code></td><td>Filtra os grupos formados</td></tr>
+    <tr><td>5</td><td><code>SELECT</code></td><td>Escolhe as colunas do resultado</td></tr>
+    <tr><td>6</td><td><code>ORDER BY</code></td><td>Ordena o resultado final</td></tr>
+    <tr><td>7</td><td><code>LIMIT</code></td><td>Limita a quantidade de linhas</td></tr>
+  </table>
+  <pre>SELECT id_usuario, COUNT(*) AS total
+FROM tarefas
+WHERE status <> 'concluida'
+GROUP BY id_usuario
+HAVING total > 1
+ORDER BY total DESC
+LIMIT 5;</pre>
+  <div class="slide-number">24 / 27</div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">Agregacoes para resolver</div>
+    <div class="box-body">
+      1. Total de usuarios cadastrados e total ativos.<br>
+      2. Total de tarefas por status, ordenado do maior para o menor.<br>
+      3. Total de tarefas por usuario (com alias <code>total</code>).<br>
+      4. Usuarios com mais de 1 tarefa pendente (HAVING).<br>
+      5. Tarefas por prioridade, apenas com 2+ tarefas.
+    </div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">Pensando na A2</div>
+    <div class="box-body">Qual consulta voce usaria para o endpoint <code>GET /usuarios/{id}/estatisticas</code> retornar o total de tarefas do usuario?</div>
+  </div>
+  <div class="slide-number">25 / 27</div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Mapa mental do DML</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Escrever dados</div><div class="box-body"><code>INSERT</code> cria | <code>UPDATE</code> altera | <code>DELETE</code> remove. Sempre com WHERE (exceto INSERT) e preferencialmente em transacao.</div></div>
+    <div class="box"><div class="box-title">Ler dados</div><div class="box-body"><code>SELECT</code> com WHERE (linhas), GROUP BY (grupos), HAVING (filtro de grupos), ORDER BY (ordem), LIMIT (quantidade).</div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Regra de seguranca</div><div class="box-body">Todo UPDATE/DELETE comeca como um SELECT. Teste a condicao, confira o COUNT, so entao execute.</div></div>
+  <div class="warn" style="margin-top: 10px;"><div class="warn-title">Mnemonica</div><div class="box-body">WHERE = filtra LINHAS | HAVING = filtra GRUPOS | Sem WHERE no UPDATE/DELETE = afeta TUDO</div></div>
+  <div class="slide-number">26 / 27</div>
+</div>
+
+<!-- SLIDE 27 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E03</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Manipulacao</div><div class="box-body">INSERT (simples, multiplo, SELECT). UPDATE/DELETE com WHERE obrigatorio. START TRANSACTION + ROLLBACK como rede de seguranca.</div></div>
+    <div class="box"><div class="box-title">Consulta</div><div class="box-body">SELECT com WHERE, LIKE, IN, BETWEEN, IS NULL. ORDER BY, DISTINCT, LIMIT/OFFSET. COUNT, SUM, AVG, MIN, MAX. GROUP BY + HAVING.</div></div>
+  </div>
+  <div style="margin-top: 20px; text-align: center; color: #555;">
+    <p><strong>Proximo encontro:</strong> SQL Avancado — JOINs, subqueries, indices e otimizacao</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">Duvidas? Fiquem a vontade para perguntar!</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">27 / 27</div>
+</div>
+
+<script>
+(function () {
+  var keywords = ['SELECT','INSERT','INTO','VALUES','UPDATE','SET','DELETE','FROM','WHERE','AND','OR','NOT','IN','BETWEEN','LIKE','IS','NULL','ORDER','BY','ASC','DESC','LIMIT','OFFSET','DISTINCT','AS','COUNT','SUM','AVG','MIN','MAX','GROUP','HAVING','START','TRANSACTION','COMMIT','ROLLBACK','USE','NOW','CREATE','DATABASE','TABLE','IF','EXISTS','CHARACTER','COLLATE','SHOW','TABLES','DATABASES','DESCRIBE','INT','BIGINT','TINYINT','DECIMAL','VARCHAR','CHAR','TEXT','JSON','ENUM','DATE','DATETIME','TIMESTAMP','AUTO_INCREMENT','PRIMARY','KEY','UNIQUE','DEFAULT','CURRENT_TIMESTAMP','ON','ENGINE','INNODB','CHARSET','ALTER','ADD','COLUMN','MODIFY','CHANGE','CONSTRAINT','FOREIGN','REFERENCES','CASCADE','RESTRICT','DROP','TRUNCATE','INDEX','JOIN','INNER','LEFT','RIGHT','OUTER','UNION','CASE','WHEN','THEN','ELSE','END'];
+  var kw = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'gi');
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var esc = pre.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var comments = [];
+    esc = esc.replace(/--[^\n]*/g, function (m) { comments.push(m); return '\u0000' + (comments.length - 1) + '\u0000'; });
+    esc = esc.replace(/'[^'\n]*'/g, function (m) { return '<span class="tok-s">' + m + '</span>'; });
+    esc = esc.replace(kw, '<span class="tok-k">$1</span>');
+    esc = esc.replace(/\u0000(\d+)\u0000/g, function (m, i) { return '<span class="tok-c">' + comments[+i] + '</span>'; });
+    pre.innerHTML = esc;
+  });
+})();
+</script>
+</body>
+</html>

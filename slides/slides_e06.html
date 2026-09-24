@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E06 - POO com PHP: Classes, Objetos, Heranca e Polimorfismo</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+pre .tok-v { color: #fca5a5; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E06</h1>
+    <div class="subtitle">POO com PHP — Classes, Objetos, Heranca e Polimorfismo</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: Classes, Objetos e Encapsulamento</span>
+      <span class="tag tag-green">Aulas 3-4: Heranca, Polimorfismo e Interfaces</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E06</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">Classes, objetos, atributos, metodos e construtores. <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">Encapsulamento: visibilidade, getters, setters e propriedades tipadas (PHP 8). <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">Heranca: extends, parent, override e classes abstratas. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (70 min)</div><div class="box-body">Polimorfismo, interfaces e type hints. <strong>Exercicio final + duvidas.</strong></div></div>
+  <div class="slide-number">2 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag">Revisao</div>
+  <h1>De onde viemos, para onde vamos</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">O que ja sabemos (E05)</div><div class="box-body">Sintaxe PHP, variaveis, operadores, estruturas condicionais, lacos, funcoes, arrays, strings e formularios GET/POST.</div></div>
+    <div class="box"><div class="box-title">O que falta</div><div class="box-body">Organizar o codigo em <strong>objetos</strong> que representam entidades do mundo real (usuarios, produtos, tarefas) — a base da API REST.</div></div>
+  </div>
+  <h2>Onde a POO entra no projeto (A2)</h2>
+<pre><span class="tok-c">// Cada tabela do banco vira uma classe PHP</span>
+<span class="tok-k">class</span> Usuario {
+    <span class="tok-k">private</span> <span class="tok-k">int</span> <span class="tok-v">$id</span>;
+    <span class="tok-k">private</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">private</span> <span class="tok-k">string</span> <span class="tok-v">$email</span>;
+    <span class="tok-c">// metodos para validar, salvar, buscar...</span>
+}</pre>
+  <p><span class="tag tag-purple">A2</span> A API REST usara classes para modelar dados, validar regras de negocio e organizar o codigo.</p>
+  <div class="slide-number">3 / 25</div>
+</div>
+
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Classes, Objetos e Construtores</h1>
+  <div class="sub">Do procedural ao orientado a objetos</div>
+  <div class="slide-number">4 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>O que e uma classe?</h1>
+  <p>Uma <strong>classe</strong> e um <em>molde</em> que define como um objeto deve ser. Ela agrupa <strong>atributos</strong> (dados) e <strong>metodos</strong> (comportamentos) em uma unica estrutura.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Produto {
+    <span class="tok-c">// Atributos (propriedades)</span>
+    <span class="tok-k">public</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">public</span> <span class="tok-k">float</span> <span class="tok-v">$preco</span>;
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-v">$estoque</span>;
+
+    <span class="tok-c">// Metodo (comportamento)</span>
+    <span class="tok-k">public</span> <span class="tok-k">function</span> exibir(): <span class="tok-k">void</span> {
+        <span class="tok-k">echo</span> <span class="tok-s">"$this-&gt;nome - R$ $this-&gt;preco"</span>;
+    }
+}</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">class</div><div class="box-body">Palavra-chave que define o molde do objeto.</div></div>
+    <div class="box"><div class="box-title">$this</div><div class="box-body">Referencia ao proprio objeto dentro da classe.</div></div>
+  </div>
+  <div class="slide-number">5 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Criando e usando objetos</h1>
+<pre>&lt;?php
+<span class="tok-c">// Instanciar = criar um objeto a partir da classe</span>
+<span class="tok-v">$p1</span> = <span class="tok-k">new</span> Produto();
+<span class="tok-v">$p1</span>-&gt;nome    = <span class="tok-s">"Notebook"</span>;
+<span class="tok-v">$p1</span>-&gt;preco   = 3500.00;
+<span class="tok-v">$p1</span>-&gt;estoque = 10;
+
+<span class="tok-v">$p1</span>-&gt;exibir();  <span class="tok-c">// Notebook - R$ 3500</span>
+
+<span class="tok-c">// Outro objeto, mesma classe</span>
+<span class="tok-v">$p2</span> = <span class="tok-k">new</span> Produto();
+<span class="tok-v">$p2</span>-&gt;nome    = <span class="tok-s">"Mouse"</span>;
+<span class="tok-v">$p2</span>-&gt;preco   = 45.90;
+<span class="tok-v">$p2</span>-&gt;estoque = 50;
+
+<span class="tok-v">$p2</span>-&gt;exibir();  <span class="tok-c">// Mouse - R$ 45.9</span></pre>
+  <p><span class="tag tag-green">Dica</span> Cada objeto e independente. Alterar <code>$p1</code> nao afeta <code>$p2</code>.</p>
+  <div class="slide-number">6 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Construtor: inicializando o objeto</h1>
+  <p>O <strong>construtor</strong> e um metodo especial chamado automaticamente ao criar o objeto com <code>new</code>. Ele garante que o objeto nasce com dados validos.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Produto {
+    <span class="tok-k">public</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">public</span> <span class="tok-k">float</span> <span class="tok-v">$preco</span>;
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-v">$estoque</span>;
+
+    <span class="tok-c">// Construtor (PHP 8+ com property promotion)</span>
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(
+        <span class="tok-k">string</span> <span class="tok-v">$nome</span>,
+        <span class="tok-k">float</span> <span class="tok-v">$preco</span>,
+        <span class="tok-k">int</span> <span class="tok-v">$estoque</span> = 0
+    ) {
+        <span class="tok-v">$this</span>-&gt;nome    = <span class="tok-v">$nome</span>;
+        <span class="tok-v">$this</span>-&gt;preco   = <span class="tok-v">$preco</span>;
+        <span class="tok-v">$this</span>-&gt;estoque = <span class="tok-v">$estoque</span>;
+    }
+}
+
+<span class="tok-v">$p</span> = <span class="tok-k">new</span> Produto(<span class="tok-s">"Teclado"</span>, 120.00, 15);
+<span class="tok-k">echo</span> <span class="tok-v">$p</span>-&gt;nome; <span class="tok-c">// Teclado</span></pre>
+  <div class="warn"><div class="warn-title">__construct</div><div class="box-body">O nome do construtor em PHP e sempre <code>__construct</code> (dois underlines).</div></div>
+  <div class="slide-number">7 / 25</div>
+</div>
+
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Property Promotion (PHP 8)</h1>
+  <p>PHP 8 permite declarar atributos diretamente no construtor, reduzindo codigo repetitivo:</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Produto {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(
+        <span class="tok-k">public</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>,
+        <span class="tok-k">public</span> <span class="tok-k">float</span> <span class="tok-v">$preco</span>,
+        <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-v">$estoque</span> = 0
+    ) {}
+}
+
+<span class="tok-c">// Mesmo resultado, menos codigo</span>
+<span class="tok-v">$p</span> = <span class="tok-k">new</span> Produto(<span class="tok-s">"Monitor"</span>, 899.90);
+<span class="tok-k">echo</span> <span class="tok-v">$p</span>-&gt;nome;    <span class="tok-c">// Monitor</span>
+<span class="tok-k">echo</span> <span class="tok-v">$p</span>-&gt;estoque; <span class="tok-c">// 0 (padrao)</span></pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Vantagem</div><div class="box-body">Menos boilerplate. Atributo e inicializacao no mesmo lugar.</div></div>
+    <div class="box"><div class="box-title">Restricao</div><div class="box-body">So funciona no construtor. Nao pode ter logica extra no corpo (a menos que necessario).</div></div>
+  </div>
+  <div class="slide-number">8 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Classe Pessoa</div>
+    <div class="box-body">Crie uma classe <code>Pessoa</code> com atributos <code>nome</code> (string) e <code>idade</code> (int). Crie um metodo <code>apresentar()</code> que exibe "Ola, sou NOME e tenho IDADE anos.".</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Construtor</div>
+    <div class="box-body">Adicione um construtor a classe <code>Pessoa</code> que receba nome e idade. Crie dois objetos diferentes e chame <code>apresentar()</code> em cada um.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Property Promotion</div>
+    <div class="box-body">Refatore a classe <code>Pessoa</code> usando property promotion (PHP 8). Teste se tudo funciona igual.</div>
+  </div>
+  <div class="slide-number">9 / 25</div>
+</div>
+
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Encapsulamento</h1>
+  <div class="sub">Protegendo os dados do objeto</div>
+  <div class="slide-number">10 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Visibilidade: public, private e protected</h1>
+  <table>
+    <tr><th>Modificador</th><th>Acesso de fora</th><th>Acesso de dentro</th><th>Acesso nas filhas</th></tr>
+    <tr><td><code>public</code></td><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+    <tr><td><code>protected</code></td><td>Nao</td><td>Sim</td><td>Sim</td></tr>
+    <tr><td><code>private</code></td><td>Nao</td><td>Sim</td><td>Nao</td></tr>
+  </table>
+<pre>&lt;?php
+<span class="tok-k">class</span> ContaBancaria {
+    <span class="tok-k">private</span> <span class="tok-k">float</span> <span class="tok-v">$saldo</span> = 0;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> depositar(<span class="tok-k">float</span> <span class="tok-v">$valor</span>): <span class="tok-k">void</span> {
+        <span class="tok-k">if</span> (<span class="tok-v">$valor</span> &gt; 0) {
+            <span class="tok-v">$this</span>-&gt;saldo += <span class="tok-v">$valor</span>;
+        }
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getSaldo(): <span class="tok-k">float</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;saldo;
+    }
+}
+
+<span class="tok-v">$conta</span> = <span class="tok-k">new</span> ContaBancaria();
+<span class="tok-v">$conta</span>-&gt;depositar(100);
+<span class="tok-k">echo</span> <span class="tok-v">$conta</span>-&gt;getSaldo(); <span class="tok-c">// 100</span>
+<span class="tok-c">// echo $conta-&gt;saldo;   // ERRO! Acesso negado</span></pre>
+  <div class="slide-number">11 / 25</div>
+</div>
+
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Getters e Setters</h1>
+  <p>Metodos controladores que permitem acesso seguro aos atributos privados, com validacao e regras de negocio.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Produto {
+    <span class="tok-k">private</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">private</span> <span class="tok-k">float</span> <span class="tok-v">$preco</span>;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(<span class="tok-k">string</span> <span class="tok-v">$nome</span>, <span class="tok-k">float</span> <span class="tok-v">$preco</span>) {
+        <span class="tok-v">$this</span>-&gt;setNome(<span class="tok-v">$nome</span>);
+        <span class="tok-v">$this</span>-&gt;setPreco(<span class="tok-v">$preco</span>);
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getNome(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;nome;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> setNome(<span class="tok-k">string</span> <span class="tok-v">$nome</span>): <span class="tok-k">void</span> {
+        <span class="tok-k">if</span> (<span class="tok-k">strlen</span>(<span class="tok-v">$nome</span>) &lt; 3) {
+            <span class="tok-k">throw</span> <span class="tok-k">new</span> <span class="tok-k">Exception</span>(<span class="tok-s">"Nome muito curto"</span>);
+        }
+        <span class="tok-v">$this</span>-&gt;nome = <span class="tok-v">$nome</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getPreco(): <span class="tok-k">float</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;preco;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> setPreco(<span class="tok-k">float</span> <span class="tok-v">$preco</span>): <span class="tok-k">void</span> {
+        <span class="tok-k">if</span> (<span class="tok-v">$preco</span> &lt; 0) {
+            <span class="tok-k">throw</span> <span class="tok-k">new</span> <span class="tok-k">Exception</span>(<span class="tok-s">"Preco nao pode ser negativo"</span>);
+        }
+        <span class="tok-v">$this</span>-&gt;preco = <span class="tok-v">$preco</span>;
+    }
+}</pre>
+  <div class="slide-number">12 / 25</div>
+</div>
+
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Propriedades tipadas e readonly (PHP 8.1+)</h1>
+<pre>&lt;?php
+<span class="tok-k">class</span> Usuario {
+    <span class="tok-c">// readonly: so pode ser escrito no construtor</span>
+    <span class="tok-k">public</span> <span class="tok-k">readonly</span> <span class="tok-k">int</span> <span class="tok-v">$id</span>;
+    <span class="tok-k">public</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">private</span> <span class="tok-k">string</span> <span class="tok-v">$senha</span>;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(<span class="tok-k">int</span> <span class="tok-v">$id</span>, <span class="tok-k">string</span> <span class="tok-v">$nome</span>, <span class="tok-k">string</span> <span class="tok-v">$senha</span>) {
+        <span class="tok-v">$this</span>-&gt;id    = <span class="tok-v">$id</span>;    <span class="tok-c">// OK: primeira e unica atribuicao</span>
+        <span class="tok-v">$this</span>-&gt;nome  = <span class="tok-v">$nome</span>;
+        <span class="tok-v">$this</span>-&gt;senha = <span class="tok-k">password_hash</span>(<span class="tok-v">$senha</span>, PASSWORD_DEFAULT);
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> verificarSenha(<span class="tok-k">string</span> <span class="tok-v">$senha</span>): <span class="tok-k">bool</span> {
+        <span class="tok-k">return</span> <span class="tok-k">password_verify</span>(<span class="tok-v">$senha</span>, <span class="tok-v">$this</span>-&gt;senha);
+    }
+}
+
+<span class="tok-v">$u</span> = <span class="tok-k">new</span> Usuario(1, <span class="tok-s">"Ana"</span>, <span class="tok-s">"123456"</span>);
+<span class="tok-k">echo</span> <span class="tok-v">$u</span>-&gt;id;      <span class="tok-c">// 1</span>
+<span class="tok-c">// $u-&gt;id = 2;    // ERRO! readonly nao pode ser alterado</span></pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Type hints</div><div class="box-body">Forcam tipos em atributos, parametros e retornos. Evitam bugs de tipo.</div></div>
+    <div class="box"><div class="box-title">readonly</div><div class="box-body">Imutavel apos a construcao. Ideal para IDs, CPFs, datas de criacao.</div></div>
+  </div>
+  <div class="slide-number">13 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Encapsulamento</div>
+    <div class="box-body">Crie uma classe <code>Aluno</code> com <code>nome</code> (private string) e <code>nota</code> (private float). Use getters e setters. No setter de nota, rejeite valores menores que 0 ou maiores que 10.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. readonly</div>
+    <div class="box-body">Adicione um atributo <code>readonly int $matricula</code> a classe <code>Aluno</code>. Tente altera-lo apos a criacao do objeto e observe o erro.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Desafio</div>
+    <div class="box-body">Crie uma classe <code>Validador</code> com um metodo estatico <code>email(string $email): bool</code> que use <code>filter_var</code> para validar e-mails. Use-o dentro do setter de email de uma classe <code>Cliente</code>.</div>
+  </div>
+  <div class="slide-number">14 / 25</div>
+</div>
+
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Heranca</h1>
+  <div class="sub">Reutilizando e especializando codigo</div>
+  <div class="slide-number">15 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Heranca com extends</h1>
+  <p>Uma classe <strong>filha</strong> herda atributos e metodos da classe <strong>pai</strong>, podendo adicionar ou sobrescrever comportamentos.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Animal {
+    <span class="tok-k">protected</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(<span class="tok-k">string</span> <span class="tok-v">$nome</span>) {
+        <span class="tok-v">$this</span>-&gt;nome = <span class="tok-v">$nome</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> falar(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"..."</span>;
+    }
+}
+
+<span class="tok-k">class</span> Cachorro <span class="tok-k">extends</span> Animal {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> falar(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"$this-&gt;nome diz: Au au!"</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> latir(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"AU AU!"</span>;
+    }
+}
+
+<span class="tok-v">$dog</span> = <span class="tok-k">new</span> Cachorro(<span class="tok-s">"Rex"</span>);
+<span class="tok-k">echo</span> <span class="tok-v">$dog</span>-&gt;falar();  <span class="tok-c">// Rex diz: Au au!</span></pre>
+  <div class="slide-number">16 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>parent:: e sobrescrita (override)</h1>
+  <p>Use <code>parent::</code> para acessar o metodo da classe pai dentro da classe filha.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> Funcionario {
+    <span class="tok-k">protected</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+    <span class="tok-k">protected</span> <span class="tok-k">float</span> <span class="tok-v">$salario</span>;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(<span class="tok-k">string</span> <span class="tok-v">$nome</span>, <span class="tok-k">float</span> <span class="tok-v">$salario</span>) {
+        <span class="tok-v">$this</span>-&gt;nome    = <span class="tok-v">$nome</span>;
+        <span class="tok-v">$this</span>-&gt;salario = <span class="tok-v">$salario</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> calcularBonus(): <span class="tok-k">float</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;salario * 0.10;
+    }
+}
+
+<span class="tok-k">class</span> Gerente <span class="tok-k">extends</span> Funcionario {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> calcularBonus(): <span class="tok-k">float</span> {
+        <span class="tok-c">// Chama o metodo da classe pai + adicional</span>
+        <span class="tok-k">return</span> <span class="tok-k">parent</span>::calcularBonus() + 500;
+    }
+}
+
+<span class="tok-v">$g</span> = <span class="tok-k">new</span> Gerente(<span class="tok-s">"Carla"</span>, 5000);
+<span class="tok-k">echo</span> <span class="tok-v">$g</span>-&gt;calcularBonus(); <span class="tok-c">// 1000 (500 + 500)</span></pre>
+  <div class="warn"><div class="warn-title">Sobrescrita</div><div class="box-body">O metodo filha deve ter a mesma assinatura (ou compativel com covariancia/contravariancia) da pai.</div></div>
+  <div class="slide-number">17 / 25</div>
+</div>
+
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Classes abstratas</h1>
+  <p>Uma classe abstrata nao pode ser instanciada diretamente. Serve de modelo para outras classes.</p>
+<pre>&lt;?php
+<span class="tok-k">abstract</span> <span class="tok-k">class</span> Pessoa {
+    <span class="tok-k">protected</span> <span class="tok-k">string</span> <span class="tok-v">$nome</span>;
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> <span class="tok-k">__construct</span>(<span class="tok-k">string</span> <span class="tok-v">$nome</span>) {
+        <span class="tok-v">$this</span>-&gt;nome = <span class="tok-v">$nome</span>;
+    }
+
+    <span class="tok-c">// Metodo concreto (com implementacao)</span>
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getNome(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;nome;
+    }
+
+    <span class="tok-c">// Metodo abstrato (sem implementacao)</span>
+    <span class="tok-k">abstract</span> <span class="tok-k">public</span> <span class="tok-k">function</span> getTipo(): <span class="tok-k">string</span>;
+}
+
+<span class="tok-k">class</span> Aluno <span class="tok-k">extends</span> Pessoa {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getTipo(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Aluno: $this-&gt;nome"</span>;
+    }
+}
+
+<span class="tok-k">class</span> Professor <span class="tok-k">extends</span> Pessoa {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> getTipo(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Professor: $this-&gt;nome"</span>;
+    }
+}
+
+<span class="tok-v">$a</span> = <span class="tok-k">new</span> Aluno(<span class="tok-s">"Joao"</span>);
+<span class="tok-k">echo</span> <span class="tok-v">$a</span>-&gt;getTipo(); <span class="tok-c">// Aluno: Joao</span></pre>
+  <div class="slide-number">18 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Heranca simples</div>
+    <div class="box-body">Crie uma classe <code>Veiculo</code> com atributos <code>marca</code> e <code>ano</code>. Crie <code>Carro</code> e <code>Moto</code> que herdam de <code>Veiculo</code> e adicionam um atributo proprio (ex: <code>portas</code> ou <code>cilindrada</code>).</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. parent::</div>
+    <div class="box-body">Na classe <code>Carro</code>, sobrescreva um metodo <code>descricao()</code> chamando <code>parent::descricao()</code> e adicionando informacoes especificas do carro.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Classe abstrata</div>
+    <div class="box-body">Transforme <code>Veiculo</code> em uma classe abstrata com um metodo abstrato <code>calcularIpva(): float</code>. Implemente-o nas classes filhas com regras diferentes.</div>
+  </div>
+  <div class="slide-number">19 / 25</div>
+</div>
+
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Polimorfismo e Interfaces</h1>
+  <div class="sub">Muitas formas, um unico contrato</div>
+  <div class="slide-number">20 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Polimorfismo em acao</h1>
+  <p><strong>Polimorfismo</strong> significa "muitas formas". Objetos de classes diferentes respondem ao mesmo metodo de formas distintas.</p>
+<pre>&lt;?php
+<span class="tok-k">class</span> PagamentoCartao {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> processar(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Processando no cartao..."</span>;
+    }
+}
+
+<span class="tok-k">class</span> PagamentoPix {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> processar(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Gerando QR Code do Pix..."</span>;
+    }
+}
+
+<span class="tok-c">// Mesmo metodo, comportamentos diferentes</span>
+<span class="tok-v">$pagamentos</span> = [<span class="tok-k">new</span> PagamentoCartao(), <span class="tok-k">new</span> PagamentoPix()];
+<span class="tok-k">foreach</span> (<span class="tok-v">$pagamentos</span> <span class="tok-k">as</span> <span class="tok-v">$p</span>) {
+    <span class="tok-k">echo</span> <span class="tok-v">$p</span>-&gt;processar() . "
+";
+}</pre>
+  <div class="box"><div class="box-title">Por que usar?</div><div class="box-body">Permite tratar objetos diferentes de forma uniforme. Essencial para APIs que recebem varios tipos de entidades.</div></div>
+  <div class="slide-number">21 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Interfaces: contratos de comportamento</h1>
+  <p>Uma <strong>interface</strong> define <em>o que</em> uma classe deve fazer, mas nao <em>como</em> fazer. Qualquer classe que a implementar deve cumprir o contrato.</p>
+<pre>&lt;?php
+<span class="tok-k">interface</span> Pagavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> pagar(<span class="tok-k">float</span> <span class="tok-v">$valor</span>): <span class="tok-k">bool</span>;
+    <span class="tok-k">public</span> <span class="tok-k">function</span> gerarComprovante(): <span class="tok-k">string</span>;
+}
+
+<span class="tok-k">class</span> Boleto <span class="tok-k">implements</span> Pagavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> pagar(<span class="tok-k">float</span> <span class="tok-v">$valor</span>): <span class="tok-k">bool</span> {
+        <span class="tok-c">// logica do boleto</span>
+        <span class="tok-k">return</span> <span class="tok-k">true</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> gerarComprovante(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Comprovante de boleto"</span>;
+    }
+}
+
+<span class="tok-k">class</span> CartaoCredito <span class="tok-k">implements</span> Pagavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> pagar(<span class="tok-k">float</span> <span class="tok-v">$valor</span>): <span class="tok-k">bool</span> {
+        <span class="tok-c">// logica do cartao</span>
+        <span class="tok-k">return</span> <span class="tok-k">true</span>;
+    }
+
+    <span class="tok-k">public</span> <span class="tok-k">function</span> gerarComprovante(): <span class="tok-k">string</span> {
+        <span class="tok-k">return</span> <span class="tok-s">"Comprovante de cartao"</span>;
+    }
+}</pre>
+  <div class="slide-number">22 / 25</div>
+</div>
+
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Type hints e tipagem de retorno</h1>
+  <p>PHP permite tipar parametros e retornos, garantindo que apenas objetos compativeis sejam aceitos.</p>
+<pre>&lt;?php
+<span class="tok-k">interface</span> Notificavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> enviar(<span class="tok-k">string</span> <span class="tok-v">$mensagem</span>): <span class="tok-k">void</span>;
+}
+
+<span class="tok-k">class</span> Notificador {
+    <span class="tok-c">// Aceita QUALQUER objeto que implemente Notificavel</span>
+    <span class="tok-k">public</span> <span class="tok-k">function</span> notificar(Notificavel <span class="tok-v">$canal</span>, <span class="tok-k">string</span> <span class="tok-v">$msg</span>): <span class="tok-k">void</span> {
+        <span class="tok-v">$canal</span>-&gt;enviar(<span class="tok-v">$msg</span>);
+    }
+}
+
+<span class="tok-k">class</span> Email <span class="tok-k">implements</span> Notificavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> enviar(<span class="tok-k">string</span> <span class="tok-v">$mensagem</span>): <span class="tok-k">void</span> {
+        <span class="tok-k">echo</span> "Email enviado: <span class="tok-v">$mensagem</span>
+";
+    }
+}
+
+<span class="tok-k">class</span> Sms <span class="tok-k">implements</span> Notificavel {
+    <span class="tok-k">public</span> <span class="tok-k">function</span> enviar(<span class="tok-k">string</span> <span class="tok-v">$mensagem</span>): <span class="tok-k">void</span> {
+        <span class="tok-k">echo</span> "SMS enviado: <span class="tok-v">$mensagem</span>
+";
+    }
+}
+
+<span class="tok-v">$n</span> = <span class="tok-k">new</span> Notificador();
+<span class="tok-v">$n</span>-&gt;notificar(<span class="tok-k">new</span> Email(), <span class="tok-s">"Ola!"</span>);
+<span class="tok-v">$n</span>-&gt;notificar(<span class="tok-k">new</span> Sms(), <span class="tok-s">"Ola!"</span>);</pre>
+  <div class="box"><div class="box-title">Type hint de interface</div><div class="box-body">O parametro <code>Notificavel $canal</code> aceita <strong>qualquer</strong> classe que implemente a interface. Isso e polimorfismo com seguranca de tipos.</div></div>
+  <div class="slide-number">23 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Interface</div>
+    <div class="box-body">Crie uma interface <code>Repositorio</code> com metodos <code>salvar(array $dados): bool</code> e <code>buscar(int $id): array</code>. Implemente-a em uma classe <code>RepositorioMySQL</code> que apenas simule as operacoes com <code>echo</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Polimorfismo</div>
+    <div class="box-body">Crie uma classe <code>Relatorio</code> com um metodo <code>gerar()</code> que aceite um <code>Repositorio</code> (type hint) e chame <code>buscar()</code> para montar um relatorio. Teste passando um <code>RepositorioMySQL</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Desafio</div>
+    <div class="box-body">Crie uma classe abstrata <code>Entidade</code> com atributos <code>id</code> (readonly) e <code>createdAt</code>. Crie uma interface <code>Validavel</code> com <code>validar(): bool</code>. Faca uma classe <code>Usuario</code> que herde <code>Entidade</code> e implemente <code>Validavel</code>.</div>
+  </div>
+  <div class="slide-number">24 / 25</div>
+</div>
+
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E06</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Fundamentos</div><div class="box-body">Classes como moldes, objetos como instancias. Construtores e property promotion (PHP 8). Encapsulamento com public/private/protected.</div></div>
+    <div class="box"><div class="box-title">Avancado</div><div class="box-body">Getters/setters com validacao. Propriedades tipadas e readonly. Heranca com extends, parent e override. Classes abstratas.</div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Padroes</div><div class="box-body">Interfaces como contratos. Polimorfismo: objetos diferentes, mesmo metodo. Type hints para seguranca de tipos na API.</div></div>
+    <div class="box"><div class="box-title">Proximo passo</div><div class="box-body">PHP + MySQL: conectar objetos ao banco com PDO e construir o CRUD da API REST.</div></div>
+  </div>
+  <div style="margin-top: 20px; text-align: center; color: #555;">
+    <p><strong>Proximo encontro:</strong> PHP + MySQL — Conexao com PDO e CRUD completo</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">Duvidas? Fiquem a vontade para perguntar!</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">25 / 25</div>
+</div>
+</body>
+</html>

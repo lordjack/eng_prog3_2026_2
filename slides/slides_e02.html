@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E02 - Modelagem Logica e SQL DDL</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E02</h1>
+    <div class="subtitle">Modelagem Logica de Dados & SQL — DDL</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: Modelagem</span>
+      <span class="tag tag-green">Aulas 3-4: SQL DDL</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 34</div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E02</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">DER -> Logico, tabelas, chaves, constraints. <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">1FN, 2FN, 3FN com exemplos. Anomalias. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">CREATE, ALTER, DROP. Tipos de dados. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (70 min)</div><div class="box-body">Criacao do BD da A2, boas praticas, indices, CASCADE. <strong>Exercicio final + duvidas.</strong></div></div>
+  <div class="slide-number">2 / 34</div>
+</div>
+
+<!-- AULA 1 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Modelagem Logica de Dados</h1>
+  <div class="sub">Do DER conceitual ao modelo logico</div>
+  <div class="slide-number">3 / 34</div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Do DER ao modelo logico</h1>
+  <p>A modelagem logica traduz o Diagrama Entidade-Relacionamento (DER) em estruturas que o SGBD entende.</p>
+  <table>
+    <tr><th>DER (Conceitual)</th><th>Logico (SGBD)</th></tr>
+    <tr><td>Entidade</td><td>Tabela</td></tr>
+    <tr><td>Atributo simples</td><td>Coluna</td></tr>
+    <tr><td>Atributo multivalorado</td><td>Nova tabela + FK</td></tr>
+    <tr><td>Atributo composto</td><td>Colunas separadas</td></tr>
+    <tr><td>Identificador</td><td>Chave primaria (PK)</td></tr>
+    <tr><td>Relacionamento 1:N</td><td>FK no lado N</td></tr>
+    <tr><td>Relacionamento N:N</td><td>Tabela associativa</td></tr>
+    <tr><td>Relacionamento 1:1</td><td>FK em uma das tabelas</td></tr>
+  </table>
+  <p><span class="tag tag-gray">Convencao</span> Tabelas no plural, colunas no singular, snake_case: <code>clientes</code>, <code>data_nascimento</code>.</p>
+  <div class="slide-number">4 / 34</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exemplo: Sistema de Pedidos</h1>
+  <p>Entidades: Cliente, Pedido, Produto. Relacionamentos: Cliente faz Pedido (1:N), Pedido contem Produto (N:N).</p>
+  <div class="two-col">
+    <div class="box"><div class="box-title">clientes</div><div class="box-body">id_cliente PK, nome, email UK, telefone</div></div>
+    <div class="box"><div class="box-title">pedidos</div><div class="box-body">id_pedido PK, data, valor_total, id_cliente FK</div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">produtos</div><div class="box-body">id_produto PK, nome, preco, estoque</div></div>
+    <div class="box"><div class="box-title">pedido_itens (associativa)</div><div class="box-body">id_item PK, id_pedido FK, id_produto FK, qtd, subtotal</div></div>
+  </div>
+  <div class="slide-number">5 / 34</div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Chaves e Constraints</h1>
+  <div class="two-col">
+    <div>
+      <h2>Tipos de chave</h2>
+      <ul>
+        <li><strong>PK:</strong> identifica cada linha. Unica, nao nula.</li>
+        <li><strong>FK:</strong> referencia PK de outra tabela.</li>
+        <li><strong>UK:</strong> valor unico, mas nao e identificador principal.</li>
+        <li><strong>Composta:</strong> PK com 2+ colunas (ex: matriculas).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Constraints</h2>
+      <ul>
+        <li><code>NOT NULL</code> — obrigatorio</li>
+        <li><code>DEFAULT</code> — valor padrao</li>
+        <li><code>CHECK</code> — validacao</li>
+        <li><code>ON DELETE CASCADE</code> — exclui filhos</li>
+        <li><code>ON UPDATE CASCADE</code> — atualiza FK</li>
+      </ul>
+    </div>
+  </div>
+  <div class="warn"><div class="warn-title">Cuidado com CASCADE</div><div class="box-body">Em producao, CASCADE pode apagar dados sem aviso. Para dados sensiveis, prefira RESTRICT ou SET NULL.</div></div>
+  <div class="slide-number">6 / 34</div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Trabalho em duplas</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Conversao DER -> Logico</div>
+    <div class="box-body">Sistema de <strong>universidade</strong>: Aluno, Curso, Disciplina, Professor. Relacionamentos: Aluno-Curso (1:N), Curso-Disciplina (1:N), Professor-Disciplina (1:N), Aluno-Disciplina (N:N). Liste tabelas, colunas, PKs e FKs.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Identificando chaves</div>
+    <div class="box-body">Para <code>usuarios(id, nome, email, cpf, id_endereco, data_nasc, ativo)</code>, defina quais sao PK, UK, FK e NOT NULL. Justifique.</div>
+  </div>
+  <p><span class="tag tag-gray">Dica</span> A matricula aluno-disciplina exige uma tabela associativa!</p>
+  <div class="slide-number">7 / 34</div>
+</div>
+
+<!-- AULA 2 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Normalizacao de Dados</h1>
+  <div class="sub">1FN, 2FN, 3FN e anomalias</div>
+  <div class="slide-number">8 / 34</div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Por que normalizar?</h1>
+  <p>Organizar dados para reduzir redundancia e evitar anomalias.</p>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Anomalia de insercao</div><div class="box-body">Nao consigo inserir um dado sem inserir outros. Ex: cadastrar professor sem disciplina.</div></div>
+    <div class="box"><div class="box-title">Anomalia de atualizacao</div><div class="box-body">Atualizar o mesmo dado em varias linhas. Ex: mudar nome do departamento em 50 registros.</div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Anomalia de exclusao</div><div class="box-body">Ao excluir um registro, perco dados de outra entidade. Ex: excluir unico aluno de um curso e perder os dados do curso.</div></div>
+  <p><span class="tag tag-red">Importante</span> Normalizar demais pode prejudicar performance. Para a A2, foque na 3FN.</p>
+  <div class="slide-number">9 / 34</div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>1FN — Primeira Forma Normal</h1>
+  <p><strong>Regra:</strong> Atributos atomicos. Sem grupos repetitivos. Sem listas em celulas.</p>
+  <h2>Antes (viola 1FN)</h2>
+  <table>
+    <tr><th>mat</th><th>aluno</th><th>disciplinas</th><th>notas</th></tr>
+    <tr><td>001</td><td>Ana</td><td>Mat, Fis</td><td>8.5, 7.0</td></tr>
+  </table>
+  <h2>Depois (1FN)</h2>
+  <table>
+    <tr><th>mat</th><th>aluno</th><th>disciplina</th><th>nota</th></tr>
+    <tr><td>001</td><td>Ana</td><td>Mat</td><td>8.5</td></tr>
+    <tr><td>001</td><td>Ana</td><td>Fis</td><td>7.0</td></tr>
+  </table>
+  <p><span class="tag tag-green">Resultado:</span> Cada celula tem um valor. Mas ainda ha redundancia no nome do aluno.</p>
+  <div class="slide-number">10 / 34</div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>1FN — Exemplo 2: atributo composto</h1>
+  <h2>Antes</h2>
+  <table>
+    <tr><th>id</th><th>nome</th><th>endereco</th></tr>
+    <tr><td>1</td><td>Maria</td><td>Rua A, 123, SP, 01000-000</td></tr>
+  </table>
+  <p><span class="tag tag-red">Problema:</span> Nao consigo buscar clientes de "SP" facilmente.</p>
+  <h2>Depois (1FN)</h2>
+  <table>
+    <tr><th>id</th><th>nome</th><th>rua</th><th>num</th><th>cidade</th><th>estado</th><th>cep</th></tr>
+    <tr><td>1</td><td>Maria</td><td>Rua A</td><td>123</td><td>Sao Paulo</td><td>SP</td><td>01000-000</td></tr>
+  </table>
+  <p><span class="tag tag-green">Resultado:</span> Agora posso filtrar por cidade, estado ou CEP individualmente.</p>
+  <div class="slide-number">11 / 34</div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>2FN — Segunda Forma Normal</h1>
+  <p><strong>Regra:</strong> 1FN + atributos nao-chave dependem da PK inteira (nao de parte dela).</p>
+  <h2>Antes (PK composta: mat + id_disc)</h2>
+  <table>
+    <tr><th>mat</th><th>id_disc</th><th>aluno</th><th>disc</th><th>nota</th></tr>
+    <tr><td>001</td><td>101</td><td>Ana</td><td>Mat</td><td>8.5</td></tr>
+    <tr><td>001</td><td>102</td><td>Ana</td><td>Fis</td><td>7.0</td></tr>
+    <tr><td>002</td><td>101</td><td>Bruno</td><td>Mat</td><td>9.0</td></tr>
+  </table>
+  <p><span class="tag tag-red">Problemas:</span> Nome do aluno depende so de mat. Nome da disciplina depende so de id_disc.</p>
+  <h2>Depois (2FN)</h2>
+  <div class="three-col">
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">alunos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>mat</th><th>nome</th></tr>
+        <tr><td>001</td><td>Ana</td></tr>
+        <tr><td>002</td><td>Bruno</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">disciplinas</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_disc</th><th>nome</th></tr>
+        <tr><td>101</td><td>Mat</td></tr>
+        <tr><td>102</td><td>Fis</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">matriculas</div></div>
+      <table style="font-size:11px;">
+        <tr><th>mat</th><th>id_disc</th><th>nota</th></tr>
+        <tr><td>001</td><td>101</td><td>8.5</td></tr>
+        <tr><td>001</td><td>102</td><td>7.0</td></tr>
+        <tr><td>002</td><td>101</td><td>9.0</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:8px;"><span class="tag tag-green">Resultado:</span> PK composta (mat + id_disc) em matriculas. Nomes aparecem uma unica vez!</p>
+  <div class="slide-number">12 / 34</div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>2FN — Exemplo 2: Pedidos</h1>
+  <h2>Antes (PK: id_pedido + id_produto)</h2>
+  <table>
+    <tr><th>id_ped</th><th>id_prod</th><th>data</th><th>cliente</th><th>prod</th><th>qtd</th><th>preco</th></tr>
+    <tr><td>101</td><td>P01</td><td>01/08</td><td>Joao</td><td>Mouse</td><td>2</td><td>50</td></tr>
+    <tr><td>101</td><td>P02</td><td>01/08</td><td>Joao</td><td>Teclado</td><td>1</td><td>120</td></tr>
+    <tr><td>102</td><td>P01</td><td>02/08</td><td>Maria</td><td>Mouse</td><td>1</td><td>50</td></tr>
+  </table>
+  <p><span class="tag tag-red">Problemas:</span> Data e cliente dependem so de id_pedido. Produto depende so de id_produto.</p>
+  <h2>Depois (3 tabelas)</h2>
+  <div class="three-col">
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">pedidos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_ped</th><th>data</th><th>cliente</th></tr>
+        <tr><td>101</td><td>01/08</td><td>Joao</td></tr>
+        <tr><td>102</td><td>02/08</td><td>Maria</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">produtos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_prod</th><th>prod</th><th>preco</th></tr>
+        <tr><td>P01</td><td>Mouse</td><td>50</td></tr>
+        <tr><td>P02</td><td>Teclado</td><td>120</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">itens</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_ped</th><th>id_prod</th><th>qtd</th></tr>
+        <tr><td>101</td><td>P01</td><td>2</td></tr>
+        <tr><td>101</td><td>P02</td><td>1</td></tr>
+        <tr><td>102</td><td>P01</td><td>1</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:8px;"><span class="tag tag-green">Ganho:</span> Se o preco do Mouse mudar, altero em um unico lugar.</p>
+  <div class="slide-number">13 / 34</div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>3FN — Terceira Forma Normal</h1>
+  <p><strong>Regra:</strong> 2FN + nenhum atributo nao-chave depende de outro atributo nao-chave.</p>
+  <h2>Antes</h2>
+  <table>
+    <tr><th>id_aluno</th><th>nome</th><th>id_curso</th><th>curso</th><th>coord</th><th>ch</th></tr>
+    <tr><td>1</td><td>Ana</td><td>C01</td><td>Eng</td><td>Silva</td><td>3600</td></tr>
+    <tr><td>2</td><td>Bruno</td><td>C01</td><td>Eng</td><td>Silva</td><td>3600</td></tr>
+    <tr><td>3</td><td>Carla</td><td>C02</td><td>Med</td><td>Souza</td><td>4800</td></tr>
+  </table>
+  <p><span class="tag tag-red">Problema:</span> Coordenador e carga horaria dependem de curso, nao de id_aluno.</p>
+  <h2>Depois (3FN)</h2>
+  <div class="two-col">
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">alunos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id</th><th>nome</th><th>id_curso</th></tr>
+        <tr><td>1</td><td>Ana</td><td>C01</td></tr>
+        <tr><td>2</td><td>Bruno</td><td>C01</td></tr>
+        <tr><td>3</td><td>Carla</td><td>C02</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">cursos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_curso</th><th>curso</th><th>coord</th><th>ch</th></tr>
+        <tr><td>C01</td><td>Eng</td><td>Silva</td><td>3600</td></tr>
+        <tr><td>C02</td><td>Med</td><td>Souza</td><td>4800</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:8px;"><span class="tag tag-green">Resultado:</span> Se o coordenador mudar, altero em um unico lugar.</p>
+  <div class="slide-number">14 / 34</div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>3FN — Exemplo 2: Funcionarios</h1>
+  <h2>Antes</h2>
+  <table>
+    <tr><th>id</th><th>nome</th><th>id_depto</th><th>depto</th><th>gerente</th><th>local</th></tr>
+    <tr><td>1</td><td>Pedro</td><td>D1</td><td>Vendas</td><td>Ana</td><td>SP</td></tr>
+    <tr><td>2</td><td>Lucas</td><td>D1</td><td>Vendas</td><td>Ana</td><td>SP</td></tr>
+    <tr><td>3</td><td>Julia</td><td>D2</td><td>TI</td><td>Bruno</td><td>RJ</td></tr>
+  </table>
+  <p><span class="tag tag-red">Problema:</span> Depto, gerente e local dependem de id_depto, nao de id_func.</p>
+  <h2>Depois (3FN)</h2>
+  <div class="two-col">
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">funcionarios</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id</th><th>nome</th><th>id_depto</th></tr>
+        <tr><td>1</td><td>Pedro</td><td>D1</td></tr>
+        <tr><td>2</td><td>Lucas</td><td>D1</td></tr>
+        <tr><td>3</td><td>Julia</td><td>D2</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="box" style="margin:0 0 4px; padding:6px 10px;"><div class="box-title" style="font-size:12px;">departamentos</div></div>
+      <table style="font-size:11px;">
+        <tr><th>id_depto</th><th>depto</th><th>gerente</th><th>local</th></tr>
+        <tr><td>D1</td><td>Vendas</td><td>Ana</td><td>SP</td></tr>
+        <tr><td>D2</td><td>TI</td><td>Bruno</td><td>RJ</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:8px;"><span class="tag tag-green">Resultado:</span> "Vendas, Ana, SP" aparece uma unica vez — sem repeticao por funcionario.</p>
+  <div class="slide-number">15 / 34</div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Resumo: 1FN -> 2FN -> 3FN</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">1FN</div><div class="box-body">Atributos atomicos. Sem grupos repetitivos. <em>"Cada celula tem um valor so."</em></div></div>
+    <div class="box"><div class="box-title">2FN</div><div class="box-body">Dependencia total da PK. <em>"Nada depende de parte da chave."</em></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">3FN</div><div class="box-body">Sem dependencias transitivas. <em>"Nada depende de algo que nao e chave."</em></div></div>
+  <div class="warn" style="margin-top: 10px;"><div class="warn-title">Mnemonica</div><div class="box-body">1FN = Celula atomica | 2FN = PK inteira | 3FN = Sem transito (transitividade)</div></div>
+  <div class="slide-number">16 / 34</div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Identifique as violacoes</div>
+    <div class="box-body">Analise a tabela abaixo e diga quais FNs ela viola:</div>
+  </div>
+  <table>
+    <tr><th>id_ped</th><th>cliente</th><th>telefones</th><th>endereco</th><th>cidade</th><th>produto</th><th>cat</th><th>qtd</th><th>preco</th></tr>
+    <tr><td>501</td><td>Maria</td><td>9999, 8888</td><td>Rua A, 100</td><td>SP</td><td>Notebook</td><td>Info</td><td>1</td><td>3500</td></tr>
+    <tr><td>501</td><td>Maria</td><td>9999, 8888</td><td>Rua A, 100</td><td>SP</td><td>Mouse</td><td>Info</td><td>2</td><td>80</td></tr>
+    <tr><td>502</td><td>Joao</td><td>7777</td><td>Rua B, 50</td><td>CTBA</td><td>Notebook</td><td>Info</td><td>1</td><td>3500</td></tr>
+  </table>
+  <div class="exercise">
+    <div class="ex-title">2. Normalize ate a 3FN</div>
+    <div class="box-body">Liste todas as tabelas, colunas, PKs e FKs. Justifique cada separacao.</div>
+  </div>
+  <div class="slide-number">17 / 34</div>
+</div>
+
+
+<!-- AULA 3 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>SQL — DDL</h1>
+  <div class="sub">CREATE, ALTER, DROP</div>
+  <div class="slide-number">18 / 34</div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>O que e DDL?</h1>
+  <p><strong>DDL</strong> (Data Definition Language) define e altera a estrutura do banco. Diferente do <strong>DML</strong> que manipula dados.</p>
+  <table>
+    <tr><th>Categoria</th><th>Comandos</th><th>Funcao</th></tr>
+    <tr><td>DDL</td><td>CREATE, ALTER, DROP, TRUNCATE</td><td>Estrutura (schema)</td></tr>
+    <tr><td>DML</td><td>INSERT, UPDATE, DELETE, SELECT</td><td>Manipulacao de dados</td></tr>
+    <tr><td>DCL</td><td>GRANT, REVOKE</td><td>Permissoes</td></tr>
+    <tr><td>TCL</td><td>COMMIT, ROLLBACK</td><td>Transacoes</td></tr>
+  </table>
+  <p><span class="tag">Lembrete</span> DDL e auto-commit no MySQL — nao da para desfazer com ROLLBACK.</p>
+  <div class="slide-number">19 / 34</div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>CREATE DATABASE e USE</h1>
+  <pre>CREATE DATABASE IF NOT EXISTS escola
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE escola;
+SHOW DATABASES;
+SHOW TABLES;
+DESCRIBE alunos;</pre>
+  <div class="warn"><div class="warn-title">Por que utf8mb4?</div><div class="box-body">Suporta emojis e todos os caracteres Unicode. O utf8 antigo trunca emojis.</div></div>
+  <div class="slide-number">20 / 34</div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>CREATE TABLE — sintaxe</h1>
+  <pre>CREATE TABLE IF NOT EXISTS alunos (
+    id_aluno        INT AUTO_INCREMENT PRIMARY KEY,
+    nome            VARCHAR(100) NOT NULL,
+    email           VARCHAR(150) UNIQUE,
+    cpf             CHAR(14) UNIQUE,
+    data_nasc       DATE,
+    ativo           TINYINT(1) DEFAULT 1,
+    criado_em       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</pre>
+  <p><span class="tag tag-gray">Dica</span> IF NOT EXISTS evita erro ao rodar o script novamente.</p>
+  <div class="slide-number">21 / 34</div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Tipos de dados do MySQL</h1>
+  <div class="two-col">
+    <div>
+      <h2>Numericos</h2>
+      <ul><li><code>INT</code> — inteiros</li><li><code>BIGINT</code> — inteiros grandes</li><li><code>DECIMAL(10,2)</code> — dinheiro</li><li><code>TINYINT</code> — booleano (0/1)</li></ul>
+      <h2>Data</h2>
+      <ul><li><code>DATE</code> — YYYY-MM-DD</li><li><code>DATETIME</code> — data + hora</li><li><code>TIMESTAMP</code> — com timezone</li></ul>
+    </div>
+    <div>
+      <h2>Texto</h2>
+      <ul><li><code>CHAR(n)</code> — fixo (CPF, CEP)</li><li><code>VARCHAR(n)</code> — variavel (nomes)</li><li><code>TEXT</code> — textos longos</li><li><code>JSON</code> — dados JSON</li></ul>
+      <h2>Especiais</h2>
+      <ul><li><code>ENUM</code> — lista fixa</li><li><code>SET</code> — multiplos valores</li></ul>
+    </div>
+  </div>
+  <p><span class="tag tag-red">Importante</span> Para dinheiro, use DECIMAL. Nunca FLOAT ou DOUBLE (imprecisao).</p>
+  <div class="slide-number">22 / 34</div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>CREATE TABLE com FK</h1>
+  <h2>Forma 1 — Inline</h2>
+  <pre>CREATE TABLE pedidos (
+    id_pedido   INT AUTO_INCREMENT PRIMARY KEY,
+    data_pedido DATE NOT NULL,
+    id_cliente  INT NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);</pre>
+  <h2>Forma 2 — Constraint nomeada (recomendada)</h2>
+  <pre>CREATE TABLE pedidos (
+    id_pedido   INT AUTO_INCREMENT PRIMARY KEY,
+    data_pedido DATE NOT NULL,
+    id_cliente  INT NOT NULL,
+    CONSTRAINT fk_pedido_cliente
+        FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);</pre>
+  <div class="slide-number">23 / 34</div>
+</div>
+
+<!-- SLIDE 25 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>ALTER TABLE</h1>
+  <pre>-- Adicionar coluna
+ALTER TABLE alunos ADD COLUMN telefone VARCHAR(20);
+
+-- Modificar coluna
+ALTER TABLE alunos MODIFY COLUMN telefone VARCHAR(25);
+
+-- Renomear coluna
+ALTER TABLE alunos CHANGE COLUMN telefone celular VARCHAR(25);
+
+-- Adicionar FK
+ALTER TABLE matriculas
+ADD CONSTRAINT fk_mat_aluno
+FOREIGN KEY (id_aluno) REFERENCES alunos(id_aluno)
+ON DELETE CASCADE;
+
+-- Remover coluna
+ALTER TABLE alunos DROP COLUMN celular;</pre>
+  <div class="slide-number">24 / 34</div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>DROP e TRUNCATE</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">DROP TABLE</div><div class="box-body">Remove tabela, dados, indices e constraints. <strong>Irreversivel.</strong><pre style="font-size:10px;padding:6px">DROP TABLE IF EXISTS alunos;</pre></div></div>
+    <div class="box"><div class="box-title">TRUNCATE TABLE</div><div class="box-body">Remove todos os dados, mantem estrutura. Mais rapido que DELETE.<pre style="font-size:10px;padding:6px">TRUNCATE TABLE alunos;</pre></div></div>
+  </div>
+  <pre>DROP DATABASE IF EXISTS escola; -- Apaga TUDO!</pre>
+  <div class="warn"><div class="warn-title">Seguranca</div><div class="box-body">Sempre use IF EXISTS. Nunca rode DROP sem backup. Em producao, prefira RENAME TABLE.</div></div>
+  <div class="slide-number">25 / 34</div>
+</div>
+
+<!-- SLIDE 27 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Crie o banco loja</div>
+    <div class="box-body">Tabelas: <code>categorias</code> (id, nome, desc), <code>produtos</code> (id, nome, preco, estoque, id_cat FK), <code>clientes</code> (id, nome, email UK, telefone, cidade). Use utf8mb4 e InnoDB.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Altere as tabelas</div>
+    <div class="box-body">a) Adicione <code>data_cadastro</code> em clientes (TIMESTAMP default now).<br>b) Adicione <code>ativo</code> em produtos (TINYINT default 1).<br>c) Renomeie <code>cidade</code> para <code>cidade_origem</code>.<br>d) Crie indice em <code>nome</code> de produtos.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Verifique</div>
+    <div class="box-body">Use <code>DESCRIBE</code> e <code>SHOW CREATE TABLE</code> para confirmar.</div>
+  </div>
+  <div class="slide-number">26 / 34</div>
+</div>
+
+<!-- AULA 4 DIVIDER -->
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Projeto e Boas Praticas</h1>
+  <div class="sub">BD da A2 + Indices + CASCADE</div>
+  <div class="slide-number">27 / 34</div>
+</div>
+
+<!-- SLIDE 29 -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Criando o BD do projeto (A2)</h1>
+  <p>Exemplo: <strong>Task Manager</strong> — sistema de tarefas para a API REST.</p>
+  <pre>CREATE DATABASE IF NOT EXISTS taskmanager
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE taskmanager;
+
+CREATE TABLE usuarios (
+    id_usuario    INT AUTO_INCREMENT PRIMARY KEY,
+    nome          VARCHAR(100) NOT NULL,
+    email         VARCHAR(150) NOT NULL UNIQUE,
+    senha_hash    VARCHAR(255) NOT NULL,
+    ativo         TINYINT(1) DEFAULT 1,
+    criado_em     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE tarefas (
+    id_tarefa     INT AUTO_INCREMENT PRIMARY KEY,
+    titulo        VARCHAR(200) NOT NULL,
+    descricao     TEXT,
+    status        ENUM('pendente','em_andamento','concluida') DEFAULT 'pendente',
+    prioridade    ENUM('baixa','media','alta') DEFAULT 'media',
+    id_usuario    INT NOT NULL,
+    criado_em     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;</pre>
+  <div class="slide-number">28 / 34</div>
+</div>
+
+<!-- SLIDE 30 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Boas praticas</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Nomenclatura</div><div class="box-body">snake_case. Tabelas no plural. PK: <code>id_tabela</code>. FK: <code>id_tabela_ref</code>. Campos de auditoria: <code>criado_em</code>, <code>atualizado_em</code>.</div></div>
+    <div class="box"><div class="box-title">Seguranca</div><div class="box-body">Nunca senha em texto plano. Use <code>password_hash()</code> no PHP. Soft delete com <code>ativo</code> ou <code>deletado_em</code>. Documente com <code>COMMENT</code>.</div></div>
+  </div>
+  <h2>Soft delete vs Hard delete</h2>
+  <div class="two-col" style="margin-top: 8px;">
+    <div class="box"><div class="box-title">Soft delete (recomendado)</div><div class="box-body">Marca como inativo. Permite recuperacao.<br><code>ativo TINYINT(1) DEFAULT 1</code></div></div>
+    <div class="box"><div class="box-title">Hard delete</div><div class="box-body">Apaga com DELETE. Risco de perda de dados e quebra de integridade.</div></div>
+  </div>
+  <div class="slide-number">29 / 34</div>
+</div>
+
+<!-- SLIDE 31 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Indices e performance</h1>
+  <p>Indices aceleram consultas, mas ocupam espaco e deixam INSERTs mais lentos.</p>
+  <pre>-- Indice simples
+CREATE INDEX idx_tarefa_status ON tarefas(status);
+
+-- Indice composto
+CREATE INDEX idx_tarefa_user_status ON tarefas(id_usuario, status);
+
+-- Indice unico
+CREATE UNIQUE INDEX idx_email ON usuarios(email);
+
+-- Ver indices
+SHOW INDEX FROM tarefas;
+
+-- Remover indice
+DROP INDEX idx_tarefa_status ON tarefas;</pre>
+  <div class="warn"><div class="warn-title">Regra de ouro</div><div class="box-body">Toda FK deve ter um indice! Sem indice, o MySQL faz full table scan em JOINs.</div></div>
+  <div class="slide-number">30 / 34</div>
+</div>
+
+<!-- SLIDE 32 -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Integridade referencial</h1>
+  <table>
+    <tr><th>Acao</th><th>ON DELETE</th><th>ON UPDATE</th><th>Quando usar</th></tr>
+    <tr><td>CASCADE</td><td>Apaga filhos</td><td>Atualiza FKs</td><td>Dados dependentes</td></tr>
+    <tr><td>SET NULL</td><td>FK vira NULL</td><td>FK vira NULL</td><td>Rel. opcional</td></tr>
+    <tr><td>RESTRICT</td><td>Bloqueia</td><td>Bloqueia</td><td>Protecao rigorosa</td></tr>
+    <tr><td>NO ACTION</td><td>Igual RESTRICT</td><td>Igual RESTRICT</td><td>Padrao MySQL</td></tr>
+  </table>
+  <pre>CREATE TABLE comentarios (
+    id_comentario INT AUTO_INCREMENT PRIMARY KEY,
+    texto TEXT NOT NULL,
+    id_tarefa INT,
+    id_usuario INT NOT NULL,
+    FOREIGN KEY (id_tarefa) REFERENCES tarefas(id_tarefa)
+        ON DELETE SET NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE
+);</pre>
+  <div class="slide-number">31 / 34</div>
+</div>
+
+<!-- SLIDE 33 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Script completo da A2</h1>
+  <pre>-- 1. Banco
+CREATE DATABASE IF NOT EXISTS taskmanager
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE taskmanager;
+
+-- 2. Usuarios
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    ativo TINYINT(1) DEFAULT 1,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- 3. Tarefas
+CREATE TABLE tarefas (
+    id_tarefa INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    descricao TEXT,
+    status ENUM('pendente','em_andamento','concluida') DEFAULT 'pendente',
+    prioridade ENUM('baixa','media','alta') DEFAULT 'media',
+    id_usuario INT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- 4. Indices
+CREATE INDEX idx_tarefa_status ON tarefas(status);
+CREATE INDEX idx_tarefa_user ON tarefas(id_usuario);</pre>
+  <div class="slide-number">32 / 34</div>
+</div>
+
+<!-- SLIDE 34 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~30 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Crie o BD do seu projeto A2</div>
+    <div class="box-body">Escolha um tema (blog, e-commerce, agenda, biblioteca) e escreva o script DDL completo com: CREATE DATABASE, CREATE TABLEs, PKs, FKs, constraints, indices e campos de auditoria.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Teste no MySQL</div>
+    <div class="box-body">Rode o script no MySQL Workbench. Use <code>DESCRIBE</code> em cada tabela. Teste inserir dados e verificar se as constraints funcionam.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Documente</div>
+    <div class="box-body">Adicione comentarios em cada campo. Salve como <code>database.sql</code> para entregar na A2.</div>
+  </div>
+  <div class="slide-number">33 / 34</div>
+</div>
+
+<!-- SLIDE 34 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E02</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Modelagem Logica</div><div class="box-body">DER -> tabelas, colunas, chaves. PK, FK, UK, constraints. 1FN: atomicos. 2FN: PK inteira. 3FN: sem transitividade.</div></div>
+    <div class="box"><div class="box-title">SQL DDL</div><div class="box-body">CREATE DATABASE/TABLE. ALTER TABLE. DROP. Tipos de dados. FKs com CASCADE. Indices. Soft delete. Auditoria.</div></div>
+  </div>
+  <div style="margin-top: 20px; text-align: center; color: #555;">
+    <p><strong>Proximo encontro:</strong> SQL DML — INSERT, UPDATE, DELETE, SELECT e JOINs</p>
+    <p style="font-size: 13px; color: #888; margin-top: 10px;">Duvidas? Fiquem a vontade para perguntar!</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">34 / 34</div>
+</div>
+
+<script>
+(function () {
+  var keywords = ['CREATE','DATABASE','TABLE','IF','NOT','EXISTS','CHARACTER','SET','COLLATE','USE','SHOW','TABLES','DATABASES','DESCRIBE','INT','BIGINT','TINYINT','DECIMAL','VARCHAR','CHAR','TEXT','JSON','ENUM','DATE','DATETIME','TIMESTAMP','AUTO_INCREMENT','PRIMARY','KEY','UNIQUE','DEFAULT','CURRENT_TIMESTAMP','ON','UPDATE','ENGINE','INNODB','CHARSET','ALTER','ADD','COLUMN','MODIFY','CHANGE','CONSTRAINT','FOREIGN','REFERENCES','DELETE','CASCADE','RESTRICT','NULL','DROP','TRUNCATE','INDEX','FROM'];
+  var kw = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'gi');
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var esc = pre.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var comments = [];
+    esc = esc.replace(/--[^\n]*/g, function (m) { comments.push(m); return '\u0000' + (comments.length - 1) + '\u0000'; });
+    esc = esc.replace(/'[^'\n]*'/g, function (m) { return '<span class="tok-s">' + m + '</span>'; });
+    esc = esc.replace(kw, '<span class="tok-k">$1</span>');
+    esc = esc.replace(/\u0000(\d+)\u0000/g, function (m, i) { return '<span class="tok-c">' + comments[+i] + '</span>'; });
+    pre.innerHTML = esc;
+  });
+})();
+</script>
+</body>
+</html>
