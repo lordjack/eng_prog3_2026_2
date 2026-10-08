@@ -1,0 +1,8 @@
+{
+  "main": "./javascript/index.js",
+  "type":"module",
+  "exports":
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
+  }
+}
