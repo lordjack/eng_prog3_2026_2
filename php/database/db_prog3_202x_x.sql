@@ -5,6 +5,16 @@
 -- HeidiSQL Versão:              12.1.0.6537
 -- --------------------------------------------------------
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
 -- Copiando estrutura do banco de dados para db_prog3_2026_1
 CREATE DATABASE IF NOT EXISTS `db_prog3_2026_1` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `db_prog3_2026_1`;
@@ -18,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `produtos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
--- Copiando dados para a tabela db_prog3_2026_1.produtos: ~4 rows (aproximadamente)
+-- Copiando dados para a tabela db_prog3_2026_1.produtos: ~6 rows (aproximadamente)
 INSERT IGNORE INTO `produtos` (`id`, `nome`, `preco`, `quantidade`) VALUES
 	(1, 'Camisa Básica', 50, 50),
 	(2, 'Smartphone', 3700, 2),
@@ -59,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
--- Copiando dados para a tabela db_prog3_2026_1.usuarios: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela db_prog3_2026_1.usuarios: ~4 rows (aproximadamente)
 INSERT IGNORE INTO `usuarios` (`id`, `nome`, `email`, `telefone`, `ativo`) VALUES
 	(7, 'Jackson', 'Jackson@ifsc.edu.br', '49 98862-0700', 1),
 	(8, 'Ana', 'Ana@ifsc.edu.br', '49 98862-5000', 0),

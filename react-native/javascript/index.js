@@ -1,6 +1,7 @@
-import { Pessoa } from "./pessoa.js";
+import promptSync from "prompt-sync";
+const prompt = promptSync();
 
-const prompt = require("prompt-sync")();
+import { Pessoa } from "./pessoa.js"; 
 
 var nome = prompt("Digite um nome: ");
 var idade = prompt("Digite sua idade: ");
