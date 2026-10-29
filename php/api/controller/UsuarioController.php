@@ -3,10 +3,10 @@
 // controller/UsuarioController.php
 
 require_once __DIR__ . '/../model/Usuario.php';
-require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/JSON.php';
 require_once __DIR__ . '/../view/usuario_json.php';
 
-class UsuarioController extends Controller
+class UsuarioController extends JSON
 {
     private Usuario $model;
     private UsuarioJsonView $view;

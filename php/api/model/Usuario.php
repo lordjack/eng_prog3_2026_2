@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config/db.class.php';
 class Usuario
 {
     private db $db;
-    private $table_name = 'usuario';
+    private $table_name = 'usuarios';
 
     public function __construct()
     {

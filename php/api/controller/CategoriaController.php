@@ -3,10 +3,10 @@
 // controller/CategoriaController.php
 
 require_once __DIR__ . '/../model/Categoria.php';
-require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/JSON.php';
 require_once __DIR__ . '/../view/categoria_json.php';
 
-class CategoriaController extends Controller
+class CategoriaController extends JSON
 {
     private Categoria $model;
     private CategoriaJsonView $view;

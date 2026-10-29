@@ -3,10 +3,10 @@
 // controller/ProdutoController.php
 
 require_once __DIR__ . '/../model/Produto.php';
-require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/JSON.php';
 require_once __DIR__ . '/../view/produto_json.php';
 
-class ProdutoController extends Controller
+class ProdutoController extends JSON
 {
     // campos permitidos na busca, para evitar SQL injection via nome de coluna
     private const CAMPOS_BUSCA_PERMITIDOS = ['nome', 'preco', 'quantidade'];

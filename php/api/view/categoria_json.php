@@ -3,9 +3,9 @@
 // view/categoria_json.php
 // Responsavel apenas por formatar e exibir as respostas em JSON.
 
-require_once __DIR__ . '/../controller/Controller.php';
+require_once __DIR__ . '/../controller/JSON.php';
 
-class CategoriaJsonView extends Controller
+class CategoriaJsonView extends JSON
 {
     public function renderListar(array $categorias): void
     {
