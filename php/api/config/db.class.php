@@ -85,7 +85,7 @@ class db
         }
     }
 
-    //SELECT * FROM tabela WHERE campo = valor
+    //SELECT * FROM tabela WHERE campo = valor (retorna todos os registros)
     public function findBy($campo, $valor)
     {
         try {
@@ -98,6 +98,12 @@ class db
         } catch (PDOException $e) {
             throw new Exception('Erro ao buscar: ' . $e->getMessage());
         }
+    }
+
+    // Retorna a conexao PDO para queries customizadas (JOINs)
+    public function getConn()
+    {
+        return $this->conn;
     }
 
     //UPDATE tabela SET campo1 = ?, campo2 = ? WHERE id = ?

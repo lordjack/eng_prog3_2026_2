@@ -1,7 +1,7 @@
 <?php
 
-// models/Usuario.php
-require_once 'config/db.class.php';
+// model/Usuario.php
+require_once __DIR__ . '/../config/db.class.php';
 
 class Usuario
 {
@@ -24,20 +24,20 @@ class Usuario
         return $dados ?: null;
     }
 
-    public function buscarPor(string $campo, string $valor): ?array
+    public function buscarPorEmail(string $email): ?object
     {
-        $dados = $this->db->findBy($campo, $valor);
-        return $dados ?: null;
+        $dados = $this->db->findBy('email', $email);
+        return $dados[0] ?? null;
     }
 
-    public function criar($dados): void
+    public function criar(array $dados): void
     {
         $this->db->store($dados);
     }
 
-    public function atualizar($dados): void
+    public function atualizar(int $id, array $dados): void
     {
-        $this->db->update($dados['id'], $dados);
+        $this->db->update($id, $dados);
     }
 
     public function excluir(int $id): void

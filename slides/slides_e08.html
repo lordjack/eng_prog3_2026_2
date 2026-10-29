@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>E08 - API REST: CRUD, Relacionamentos, Buscas e Validacoes</title>
+<style>
+@page { size: 297mm 210mm; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f172a; --muted: #64748b;
+  --ifsc-green: #006633; --ifsc-orange: #FF6600;
+  --grad: linear-gradient(135deg, #006633, #00804d 60%, #FF6600);
+}
+body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #1e293b; background: #e8edf5; }
+.slide { width: 100%; height: 190mm; padding: 12mm 14mm 16mm; page-break-after: always; position: relative; border: none; border-radius: 16px; margin-bottom: 10mm; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); overflow: hidden; }
+.slide:last-child { page-break-after: auto; }
+.slide::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 7px; background: var(--grad); }
+.slide-number { position: absolute; bottom: 8mm; right: 12mm; font-size: 11px; font-weight: 600; color: #fff; background: #004d26; padding: 3px 12px; border-radius: 20px; letter-spacing: .5px; }
+.aula-tag { display: inline-block; background: #006633; color: #fff; padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,102,51,.25); }
+.aula-tag.aula1 { background: linear-gradient(135deg,#006633,#004d26); }
+.aula-tag.aula2 { background: linear-gradient(135deg,#16a34a,#15803d); }
+.aula-tag.aula3 { background: linear-gradient(135deg,#e8590c,#d9480f); }
+.aula-tag.aula4 { background: linear-gradient(135deg,#FF6600,#cc5200); }
+.aula-tag.intervalo { background: linear-gradient(135deg,#6b7280,#4b5563); }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 14px; color: #0f172a; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; position: relative; }
+h1::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 90px; height: 2px; background: var(--grad); }
+h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: #334155; }
+p { margin-bottom: 10px; }
+ul { margin: 8px 0 8px 24px; }
+li { margin-bottom: 5px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+th:last-child, td:last-child { border-right: none; }
+tr:last-child td { border-bottom: none; }
+th { background: linear-gradient(135deg,#e6f3ec,#f0faf5); color: #006633; font-weight: 700; }
+tr:nth-child(even) td { background: #f8fafc; }
+pre { background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-family: "Consolas", "Monaco", monospace; font-size: 12px; line-height: 1.55; margin: 10px 0; box-shadow: inset 0 0 0 1px #1e293b, 0 4px 14px rgba(15,23,42,.18); }
+pre .tok-k { color: #7dd3fc; font-weight: 600; }
+pre .tok-s { color: #86efac; }
+pre .tok-c { color: #64748b; font-style: italic; }
+pre .tok-v { color: #fca5a5; }
+code { background: #e6f3ec; color: #006633; padding: 2px 6px; border-radius: 5px; font-family: "Consolas", monospace; font-size: 12px; }
+pre code { background: transparent; color: inherit; padding: 0; }
+.box { background: #f8fafc; border-radius: 10px; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-left: 4px solid #006633; box-shadow: 0 2px 6px rgba(15,23,42,.05); }
+.box-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #0f172a; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.exercise { background: linear-gradient(135deg,#fff5ec,#ffedd9); border-left: 5px solid #FF6600; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.exercise::before { content: "\1F4DD"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.ex-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #b34700; }
+.homework { background: linear-gradient(135deg,#f0f9ff,#e0f2fe); border-left: 5px solid #0284c7; padding: 12px 14px 12px 42px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.homework::before { content: "\1F3E0"; position: absolute; left: 13px; top: 10px; font-size: 16px; }
+.hw-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: #0369a1; }
+.warn { background: linear-gradient(135deg,#fef2f2,#fff1f2); border-left: 5px solid #dc2626; padding: 10px 12px 10px 40px; margin: 10px 0; border-radius: 0 10px 10px 0; position: relative; }
+.warn::before { content: "\26A0\FE0F"; position: absolute; left: 12px; top: 9px; font-size: 15px; }
+.warn-title { font-weight: 700; color: #991b1b; font-size: 13px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e6f3ec; color: #006633; margin-right: 4px; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+.tag-purple { background: #ffedd9; color: #b34700; }
+.tag-blue { background: #e0f2fe; color: #0369a1; }
+.slide.cover { background: linear-gradient(135deg, #004d26 0%, #006633 55%, #007a3d 100%); color: #fff; }
+.slide.cover::before { display: none; }
+.cover { text-align: center; padding-top: 16mm; }
+.cover h1 { font-size: 44px; border: none; color: #fff; letter-spacing: 1px; }
+.cover h1::after { display: none; }
+.cover .subtitle { font-size: 20px; color: #ffb380; margin-bottom: 18px; }
+.cover .meta { font-size: 14px; color: #b9e6cf; margin-top: 24px; }
+.cover .prof { margin-top: 18px; font-size: 16px; color: #fff; font-weight: 600; }
+.cover .prof small { display: block; font-weight: 400; font-size: 13px; color: #ffb380; margin-top: 4px; }
+.ifsc-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8mm; }
+.ifsc-grid { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+.ifsc-grid span { background: #fff; border-radius: 2px; }
+.ifsc-grid span:nth-child(2) { background: #FF6600; }
+.ifsc-grid span:nth-child(5) { background: #FF6600; }
+.ifsc-grid span:nth-child(8) { background: #FF6600; }
+.ifsc-brand-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; line-height: 1.3; text-align: left; }
+.ifsc-brand-text small { display: block; font-weight: 400; letter-spacing: 1px; font-size: 11px; color: #b9e6cf; }
+.cover-divider { width: 120px; height: 3px; background: #FF6600; margin: 6mm auto; border-radius: 2px; }
+.slide.cover .tag { background: rgba(255,255,255,.18); color: #fff; }
+.slide.cover .slide-number { background: rgba(255,255,255,.22); }
+.slide.divider { background: linear-gradient(135deg, #00291a 0%, #006633 100%); color: #fff; }
+.slide.divider::before { display: none; }
+.divider { text-align: center; padding-top: 46mm; }
+.divider h1 { font-size: 36px; border: none; color: #fff; }
+.divider h1::after { display: none; }
+.divider .sub { font-size: 16px; color: #b9e6cf; margin-top: 6px; }
+.slide.divider .slide-number { background: rgba(255,255,255,.22); }
+.slide.compact { font-size: 12.5px; }
+.slide.compact h1 { font-size: 21px; margin-bottom: 8px; padding-bottom: 6px; }
+.slide.compact h2 { font-size: 13.5px; margin: 6px 0 4px; }
+.slide.compact p { margin-bottom: 6px; }
+.slide.compact table { margin: 6px 0; font-size: 10.5px; }
+.slide.compact th, .slide.compact td { padding: 3px 6px; }
+.slide.compact pre { font-size: 10px; padding: 10px 12px; margin: 6px 0; }
+.slide.compact .box { padding: 8px 10px; margin: 5px 0; }
+.slide.compact .warn { padding: 7px 10px 7px 36px; margin: 6px 0; }
+@media print {
+  body { background: #fff; }
+  .slide { page-break-after: always; border: none; margin: 0; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: CAPA -->
+<div class="slide cover">
+  <div class="cover">
+    <div class="ifsc-brand">
+      <div class="ifsc-grid">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="ifsc-brand-text">Instituto Federal<small>Santa Catarina</small></div>
+    </div>
+    <h1>Encontro E08</h1>
+    <div class="subtitle">API REST: CRUD completo, Relacionamentos, Buscas e Validacoes</div>
+    <div class="cover-divider"></div>
+    <div style="margin: 12px 0;">
+      <span class="tag">Aulas 1-2: CRUD REST com MVC</span>
+      <span class="tag tag-green">Aulas 3-4: Relacionamentos e Validacoes</span>
+    </div>
+    <div class="meta">Disciplina: Programacao III — Banco de Dados + PHP/MySQL</div>
+    <div class="prof">Prof. Msc Jackson Meires<small>jackson.meires@ifsc.edu.br</small></div>
+  </div>
+  <div class="slide-number">1 / 26</div>
+</div>
+
+<!-- SLIDE 2: AGENDA -->
+<div class="slide">
+  <div class="aula-tag">Agenda</div>
+  <h1>Agenda do dia — E08</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Aula 1 (50 min)</div><div class="box-body">Estrutura MVC com <code>db.class.php</code>. Endpoints <code>GET</code> (listar/buscar) e <code>POST</code> (criar). <strong>Exercicio em sala.</strong></div></div>
+    <div class="box"><div class="box-title">Aula 2 (50 min)</div><div class="box-body">Endpoints <code>PUT</code> (atualizar) e <code>DELETE</code> (remover). Tratamento centralizado de erros. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Intervalo (20 min)</div><div class="box-body">Pausa para cafe e descanso.</div></div>
+    <div class="box"><div class="box-title">Aula 3 (50 min)</div><div class="box-body">Relacionamentos 1:N e N:M. JOINs com PDO. API com entidades relacionadas. <strong>Exercicio em sala.</strong></div></div>
+  </div>
+  <div class="box" style="margin-top: 10px;"><div class="box-title">Aula 4 (50 min)</div><div class="box-body">Buscas avancadas (<code>search</code>, <code>LIKE</code>). Validacoes de dados. Resposta padronizada de erro. <strong>Exercicio + tarefa para casa.</strong></div></div>
+  <div class="slide-number">2 / 26</div>
+</div>
+
+<!-- SLIDE 3: REVISAO -->
+<div class="slide">
+  <div class="aula-tag">Revisao</div>
+  <h1>De onde viemos (E07)</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">O que ja sabemos</div><div class="box-body">PDO com <code>db.class.php</code>, MVC basico (Model, View JSON, Controller), roteamento com <code>.htaccess</code>, API REST com metodos HTTP e status codes.</div></div>
+    <div class="box"><div class="box-title">O que vamos aprofundar</div><div class="box-body">CRUD completo via API com validacoes, relacionamentos entre tabelas (1:N e N:M), buscas com <code>LIKE</code> e tratamento robusto de erros.</div></div>
+  </div>
+  <h2>Projeto (A2) — O que falta</h2>
+<pre><span class="tok-c">// E07: API basica de uma unica entidade</span>
+GET /produtos       -> lista todos
+POST /produtos      -> cria novo
+
+<span class="tok-c">// E08: API completa com relacionamentos</span>
+GET /produtos/5              -> produto + categoria
+GET /categorias/3/produtos   -> todos os produtos da categoria 3
+GET /produtos?busca=teclado  -> busca por nome</pre>
+  <p><span class="tag tag-purple">A2</span> O app React Native precisara listar, buscar e filtrar dados — tudo via API REST.</p>
+  <div class="slide-number">3 / 26</div>
+</div>
+
+<!-- SLIDE 4: DIVISOR AULA 1 -->
+<div class="slide divider">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>CRUD REST com MVC</h1>
+  <div class="sub">GET e POST usando db.class.php</div>
+  <div class="slide-number">4 / 26</div>
+</div>
+
+<!-- SLIDE 5: ESTRUTURA MVC -->
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Estrutura de pastas do projeto (php/api)</h1>
+  <p>A classe <code>config/db.class.php</code> e a base de tudo. Ela fornece os metodos genericos de CRUD que os Models utilizam.</p>
+<pre><span class="tok-c"># Estrutura real do projeto: php/api</span>
+php/api/
+├── index.php               <span class="tok-c"># roteador central</span>
+├── .htaccess               <span class="tok-c"># rewrite rules</span>
+├── config/
+│   └── db.class.php        <span class="tok-c"># conexao PDO + CRUD generico</span>
+├── model/
+│   └── Produto.php         <span class="tok-c"># cria seu proprio db no construtor</span>
+├── controller/
+│   ├── Controller.php      <span class="tok-c"># classe base com resposta()</span>
+│   └── ProdutoController.php
+├── view/
+│   └── produto_json.php    <span class="tok-c"># ProdutoJsonView extends Controller</span>
+└── utils/                  <span class="tok-c"># ainda vazia — criaremos Validador.php na Aula 4</span></pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">db.class.php</div><div class="box-body">Classe generica com <code>all()</code>, <code>find()</code>, <code>findBy()</code>, <code>store()</code>, <code>update()</code>, <code>delete()</code>, <code>search()</code>.</div></div>
+    <div class="box"><div class="box-title">Model</div><div class="box-body">Cria sua propria instancia de <code>db</code> no construtor (<code>new db('produtos')</code>) — nao recebe por injecao. Adiciona regras da entidade.</div></div>
+  </div>
+  <div class="slide-number">5 / 26</div>
+</div>
+
+<!-- SLIDE 6: GET LISTAR E BUSCAR -->
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>GET — Listar e Buscar por ID</h1>
+<pre>&lt;?php
+<span class="tok-c">// model/Produto.php</span>
+<span class="tok-k">require_once</span> <span class="tok-v">__DIR__</span> . <span class="tok-s">'/../config/db.class.php'</span>;
+
+<span class="tok-k">class</span> Produto {
+    <span class="tok-k">private</span> db <span class="tok-v">$db</span>;
+    <span class="tok-k">public function</span> <span class="tok-k">__construct</span>() { <span class="tok-v">$this</span>-&gt;db = <span class="tok-k">new</span> db(<span class="tok-s">'produtos'</span>); }
+
+    <span class="tok-k">public function</span> listar(): <span class="tok-k">array</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;db-&gt;all(); <span class="tok-c">// SELECT * FROM produtos</span>
+    }
+    <span class="tok-k">public function</span> buscar(<span class="tok-k">int</span> <span class="tok-v">$id</span>): ?<span class="tok-k">object</span> {
+        <span class="tok-v">$r</span> = <span class="tok-v">$this</span>-&gt;db-&gt;find(<span class="tok-v">$id</span>); <span class="tok-c">// SELECT * WHERE id = ?</span>
+        <span class="tok-k">return</span> <span class="tok-v">$r</span> ?: <span class="tok-k">null</span>;
+    }
+}
+
+<span class="tok-c">// controller/ProdutoController.php</span>
+<span class="tok-k">class</span> ProdutoController <span class="tok-k">extends</span> Controller {
+    <span class="tok-k">private</span> Produto <span class="tok-v">$model</span>;
+    <span class="tok-k">private</span> ProdutoJsonView <span class="tok-v">$view</span>;
+    <span class="tok-k">public function</span> <span class="tok-k">__construct</span>() {
+        <span class="tok-v">$this</span>-&gt;model = <span class="tok-k">new</span> Produto();
+        <span class="tok-v">$this</span>-&gt;view = <span class="tok-k">new</span> ProdutoJsonView();
+    }
+    <span class="tok-k">public function</span> listar(): <span class="tok-k">void</span> {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderListar(<span class="tok-v">$this</span>-&gt;model-&gt;listar());
+    }
+    <span class="tok-k">public function</span> buscar(<span class="tok-k">int</span> <span class="tok-v">$id</span>): <span class="tok-k">void</span> {
+        <span class="tok-v">$produto</span> = <span class="tok-v">$this</span>-&gt;model-&gt;buscar(<span class="tok-v">$id</span>);
+        <span class="tok-k">if</span>(<span class="tok-v">$produto</span>) <span class="tok-v">$this</span>-&gt;view-&gt;renderBuscar(<span class="tok-v">$produto</span>);
+        <span class="tok-k">else</span>          <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Produto nao encontrado'</span>, 404);
+    }
+}</pre>
+  <div class="slide-number">6 / 26</div>
+</div>
+
+<!-- SLIDE 7: POST CRIAR -->
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>POST — Criar com validacao basica</h1>
+<pre>&lt;?php
+<span class="tok-c">// controller/ProdutoController.php</span>
+<span class="tok-k">public function</span> criar(): <span class="tok-k">void</span> {
+    <span class="tok-v">$dados</span> = <span class="tok-v">$this</span>-&gt;getDadosRequisicao(); <span class="tok-c">// le e decodifica php://input</span>
+
+    <span class="tok-k">if</span>(<span class="tok-k">empty</span>(<span class="tok-v">$dados</span>[<span class="tok-s">'nome'</span>]) || !<span class="tok-k">isset</span>(<span class="tok-v">$dados</span>[<span class="tok-s">'preco'</span>]) || !<span class="tok-k">isset</span>(<span class="tok-v">$dados</span>[<span class="tok-s">'quantidade'</span>])) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Campos obrigatorios: nome, preco, quantidade'</span>, 400);
+        <span class="tok-k">return</span>;
+    }
+
+    <span class="tok-k">try</span> {
+        <span class="tok-v">$this</span>-&gt;model-&gt;criar([
+            <span class="tok-s">'nome'</span> =&gt; <span class="tok-v">$dados</span>[<span class="tok-s">'nome'</span>],
+            <span class="tok-s">'preco'</span> =&gt; (<span class="tok-k">float</span>) <span class="tok-v">$dados</span>[<span class="tok-s">'preco'</span>],
+            <span class="tok-s">'quantidade'</span> =&gt; (<span class="tok-k">int</span>) <span class="tok-v">$dados</span>[<span class="tok-s">'quantidade'</span>],
+        ]);
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderCriar(); <span class="tok-c">// 201 + mensagem padrao</span>
+    } <span class="tok-k">catch</span>(Exception <span class="tok-v">$e</span>) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-v">$e</span>-&gt;getMessage(), 500);
+    }
+}
+
+<span class="tok-c">// model/Produto.php</span>
+<span class="tok-k">public function</span> criar(<span class="tok-v">$dados</span>): <span class="tok-k">void</span> {
+    <span class="tok-v">$this</span>-&gt;db-&gt;store(<span class="tok-v">$dados</span>);
+}</pre>
+  <div class="box"><div class="box-title">Validacao no Controller</div><div class="box-body">Sempre valide antes de chamar o Model. A View (<code>*JsonView</code>) padroniza <code>400 Bad Request</code> para dados invalidos e <code>500</code> para erros de banco.</div></div>
+  <div class="slide-number">7 / 26</div>
+</div>
+
+<!-- SLIDE 8: ROTEAMENTO GET POST -->
+<div class="slide compact">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Roteamento — GET e POST no index.php</h1>
+<pre>&lt;?php
+<span class="tok-c">// index.php — roteador central</span>
+<span class="tok-k">require_once</span> <span class="tok-v">__DIR__</span> . <span class="tok-s">'/controller/ProdutoController.php'</span>;
+
+<span class="tok-v">$url</span>    = <span class="tok-v">$_GET</span>[<span class="tok-s">'url'</span>] ?? <span class="tok-s">''</span>;
+<span class="tok-v">$url</span>    = <span class="tok-k">explode</span>(<span class="tok-s">'/'</span>, <span class="tok-k">trim</span>(<span class="tok-v">$url</span>, <span class="tok-s">'/'</span>));
+<span class="tok-v">$metodo</span> = <span class="tok-v">$_SERVER</span>[<span class="tok-s">'REQUEST_METHOD'</span>];
+<span class="tok-v">$controller</span> = <span class="tok-k">new</span> ProdutoController(); <span class="tok-c">// Model e View sao criados no proprio construtor</span>
+
+<span class="tok-k">if</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && <span class="tok-k">empty</span>(<span class="tok-v">$url</span>[1]) && <span class="tok-v">$metodo</span> === <span class="tok-s">'GET'</span>) {
+    <span class="tok-v">$controller</span>-&gt;listar();
+} <span class="tok-k">elseif</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && <span class="tok-k">is_numeric</span>(<span class="tok-v">$url</span>[1]) && <span class="tok-v">$metodo</span> === <span class="tok-s">'GET'</span>) {
+    <span class="tok-v">$controller</span>-&gt;buscar((<span class="tok-k">int</span>) <span class="tok-v">$url</span>[1]);
+} <span class="tok-k">elseif</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && <span class="tok-k">empty</span>(<span class="tok-v">$url</span>[1]) && <span class="tok-v">$metodo</span> === <span class="tok-s">'POST'</span>) {
+    <span class="tok-v">$controller</span>-&gt;criar();
+} <span class="tok-k">else</span> {
+    <span class="tok-v">$controller</span>-&gt;rotaNaoEncontrada();
+}</pre>
+  <div class="box"><div class="box-title">.htaccess</div><div class="box-body"><code>RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]</code> — toda requisicao cai em <code>index.php</code>, e a URL vira <code>$_GET['url']</code>.</div></div>
+  <div class="slide-number">8 / 26</div>
+</div>
+
+<!-- SLIDE 9: EXERCICIO AULA 1 -->
+<div class="slide">
+  <div class="aula-tag aula1">Aula 1</div>
+  <h1>Exercicio — Aula 1 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Criar a tabela categorias</div>
+    <div class="box-body">Crie a tabela <code>categorias</code> (id, nome, descricao) no banco <code>db_prog3_202x_x</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Model, Controller e View</div>
+    <div class="box-body">Replique exatamente o padrao usado em <code>Produto</code>: crie <code>model/Categoria.php</code> (cria o proprio <code>db</code> no construtor), <code>controller/CategoriaController.php</code> (extends <code>Controller</code>) e <code>view/categoria_json.php</code> com <code>listar()</code>, <code>buscar($id)</code> e <code>criar()</code>.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Registrar as rotas e testar</div>
+    <div class="box-body">Adicione as rotas de <code>categorias</code> no <code>index.php</code>. Teste <code>GET /categorias</code>, <code>POST /categorias</code> com JSON <code>{"nome":"Eletronicos"}</code> no Postman.</div>
+  </div>
+  <div class="slide-number">9 / 26</div>
+</div>
+
+<!-- SLIDE 10: DIVISOR AULA 2 -->
+<div class="slide divider">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>PUT, DELETE e Tratamento de Erros</h1>
+  <div class="sub">Completando o CRUD REST com seguranca</div>
+  <div class="slide-number">10 / 26</div>
+</div>
+
+<!-- SLIDE 11: PUT ATUALIZAR -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>PUT — Atualizar com validacao</h1>
+<pre>&lt;?php
+<span class="tok-c">// controller/ProdutoController.php</span>
+<span class="tok-k">public function</span> atualizar(<span class="tok-k">int</span> <span class="tok-v">$id</span>): <span class="tok-k">void</span> {
+    <span class="tok-c">// valida existencia</span>
+    <span class="tok-k">if</span>(!<span class="tok-v">$this</span>-&gt;model-&gt;buscar(<span class="tok-v">$id</span>)) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Produto nao encontrado'</span>, 404);
+        <span class="tok-k">return</span>;
+    }
+    <span class="tok-v">$dados</span> = <span class="tok-v">$this</span>-&gt;getDadosRequisicao();
+    <span class="tok-k">if</span>(<span class="tok-k">empty</span>(<span class="tok-v">$dados</span>)) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Nenhum dado enviado para atualizacao'</span>, 400);
+        <span class="tok-k">return</span>;
+    }
+
+    <span class="tok-k">try</span> {
+        <span class="tok-v">$this</span>-&gt;model-&gt;atualizar(<span class="tok-v">$id</span>, <span class="tok-v">$dados</span>);
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderAtualizar();
+    } <span class="tok-k">catch</span>(Exception <span class="tok-v">$e</span>) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-v">$e</span>-&gt;getMessage(), 500);
+    }
+}
+
+<span class="tok-c">// model/Produto.php</span>
+<span class="tok-k">public function</span> atualizar(<span class="tok-k">int</span> <span class="tok-v">$id</span>, <span class="tok-k">array</span> <span class="tok-v">$dados</span>): <span class="tok-k">void</span> {
+    <span class="tok-v">$this</span>-&gt;db-&gt;update(<span class="tok-v">$id</span>, <span class="tok-v">$dados</span>); <span class="tok-c">// monta SET dinamicamente</span>
+}</pre>
+  <div class="box"><div class="box-title">update($id, $dados)</div><div class="box-body">O metodo <code>update</code> da classe <code>db</code> monta o <code>SET</code> dinamicamente a partir do array. So nao atualiza o campo <code>id</code>.</div></div>
+  <div class="slide-number">11 / 26</div>
+</div>
+
+<!-- SLIDE 12: DELETE REMOVER -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>DELETE — Remover com verificacao</h1>
+<pre>&lt;?php
+<span class="tok-c">// controller/ProdutoController.php</span>
+<span class="tok-k">public function</span> excluir(<span class="tok-k">int</span> <span class="tok-v">$id</span>): <span class="tok-k">void</span> {
+    <span class="tok-c">// verifica se existe antes de deletar</span>
+    <span class="tok-k">if</span>(!<span class="tok-v">$this</span>-&gt;model-&gt;buscar(<span class="tok-v">$id</span>)) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Produto nao encontrado'</span>, 404);
+        <span class="tok-k">return</span>;
+    }
+
+    <span class="tok-k">try</span> {
+        <span class="tok-v">$this</span>-&gt;model-&gt;excluir(<span class="tok-v">$id</span>);
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderExcluir();
+    } <span class="tok-k">catch</span>(Exception <span class="tok-v">$e</span>) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-v">$e</span>-&gt;getMessage(), 500);
+    }
+}
+
+<span class="tok-c">// model/Produto.php</span>
+<span class="tok-k">public function</span> excluir(<span class="tok-k">int</span> <span class="tok-v">$id</span>): <span class="tok-k">void</span> {
+    <span class="tok-v">$this</span>-&gt;db-&gt;delete(<span class="tok-v">$id</span>); <span class="tok-c">// DELETE FROM produtos WHERE id = ?</span>
+}
+
+<span class="tok-c">// index.php — adicione ao roteador:</span>
+<span class="tok-k">elseif</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && <span class="tok-k">is_numeric</span>(<span class="tok-v">$url</span>[1]) && <span class="tok-v">$metodo</span> === <span class="tok-s">'PUT'</span>) {
+    <span class="tok-v">$controller</span>-&gt;atualizar((<span class="tok-k">int</span>) <span class="tok-v">$url</span>[1]);
+} <span class="tok-k">elseif</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && <span class="tok-k">is_numeric</span>(<span class="tok-v">$url</span>[1]) && <span class="tok-v">$metodo</span> === <span class="tok-s">'DELETE'</span>) {
+    <span class="tok-v">$controller</span>-&gt;excluir((<span class="tok-k">int</span>) <span class="tok-v">$url</span>[1]);
+}</pre>
+  <div class="warn"><div class="warn-title">Cuidado com DELETE</div><div class="box-body">Sempre verifique se o recurso existe antes de remover. Retorne <code>404</code> se nao existir, nao <code>200</code>.</div></div>
+  <div class="slide-number">12 / 26</div>
+</div>
+
+<!-- SLIDE 13: TRATAMENTO ERROS -->
+<div class="slide compact">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Tratamento centralizado de erros</h1>
+  <p>Em vez de repetir <code>header()</code>/<code>http_response_code()</code>/<code>json_encode()</code> em cada metodo, o projeto centraliza isso na classe <code>Controller</code> e nas Views <code>*JsonView</code>.</p>
+<pre>&lt;?php
+<span class="tok-c">// controller/Controller.php</span>
+<span class="tok-k">header</span>(<span class="tok-s">'Content-Type: application/json; charset=utf-8'</span>);
+
+<span class="tok-k">class</span> Controller {
+    <span class="tok-k">public function</span> resposta(<span class="tok-k">array</span> <span class="tok-v">$dados</span>, <span class="tok-k">int</span> <span class="tok-v">$status</span> = 200): <span class="tok-k">void</span> {
+        <span class="tok-k">http_response_code</span>(<span class="tok-v">$status</span>);
+        <span class="tok-k">echo</span> <span class="tok-k">json_encode</span>(<span class="tok-v">$dados</span>, JSON_PRETTY_PRINT);
+    }
+}
+
+<span class="tok-c">// view/produto_json.php — toda *JsonView extends Controller</span>
+<span class="tok-k">class</span> ProdutoJsonView <span class="tok-k">extends</span> Controller {
+    <span class="tok-k">public function</span> renderErro(<span class="tok-k">string</span> <span class="tok-v">$erro</span>, <span class="tok-k">int</span> <span class="tok-v">$status</span> = 400): <span class="tok-k">void</span> {
+        <span class="tok-v">$this</span>-&gt;resposta([<span class="tok-s">'sucesso'</span>=&gt;<span class="tok-k">false</span>, <span class="tok-s">'erro'</span>=&gt;<span class="tok-v">$erro</span>], <span class="tok-v">$status</span>);
+    }
+    <span class="tok-c">// renderListar(), renderBuscar(), renderCriar()... seguem o mesmo padrao</span>
+}</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">Controller (base)</div><div class="box-body">So sabe transformar um array PHP em resposta HTTP + JSON. Nao conhece regra de negocio nenhuma.</div></div>
+    <div class="box"><div class="box-title">renderErro() nas Views</div><div class="box-body">Cada <code>*JsonView</code> herda de <code>Controller</code> e padroniza o formato <code>{sucesso, erro}</code> ou <code>{sucesso, dados}</code> em todos os endpoints.</div></div>
+  </div>
+  <div class="slide-number">13 / 26</div>
+</div>
+
+<!-- SLIDE 14: EXERCICIO AULA 2 -->
+<div class="slide">
+  <div class="aula-tag aula2">Aula 2</div>
+  <h1>Exercicio — Aula 2 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Implementar PUT</div>
+    <div class="box-body">Adicione <code>atualizar()</code> em <code>model/Categoria.php</code> e <code>controller/CategoriaController.php</code>, seguindo o padrao usado em <code>Produto</code>. Registre a rota <code>PUT /categorias/{id}</code> no <code>index.php</code>. Teste no Postman.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Implementar DELETE</div>
+    <div class="box-body">Adicione <code>excluir()</code>. A rota <code>DELETE /categorias/{id}</code> deve retornar <code>404</code> se o ID nao existir e <code>200</code> se remover com sucesso.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Testar o CRUD completo</div>
+    <div class="box-body">Crie uma categoria (POST), liste (GET), atualize o nome (PUT), busque por ID (GET) e remova (DELETE). Verifique cada status code no Postman.</div>
+  </div>
+  <div class="slide-number">14 / 26</div>
+</div>
+
+<!-- SLIDE 15: DIVISOR AULA 3 -->
+<div class="slide divider">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Relacionamentos entre Entidades</h1>
+  <div class="sub">1:N e N:M com JOINs no PDO</div>
+  <div class="slide-number">15 / 26</div>
+</div>
+
+<!-- SLIDE 16: RELACIONAMENTO 1N -->
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Relacionamento 1:N (Categoria &rarr; Produtos)</h1>
+  <p>Uma categoria possui muitos produtos. Vamos adicionar a tabela <code>categorias</code> e a <strong>chave estrangeira</strong> <code>categoria_id</code> em <code>produtos</code>.</p>
+<pre><span class="tok-c">-- SQL: nova tabela + FK em produtos (ja existente)</span>
+<span class="tok-k">CREATE TABLE</span> categorias (
+    id <span class="tok-k">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    nome <span class="tok-k">VARCHAR</span>(100) <span class="tok-k">NOT NULL</span>,
+    descricao <span class="tok-k">VARCHAR</span>(255)
+);
+<span class="tok-k">ALTER TABLE</span> produtos
+    <span class="tok-k">ADD COLUMN</span> categoria_id <span class="tok-k">INT NULL</span>,
+    <span class="tok-k">ADD FOREIGN KEY</span> (categoria_id) <span class="tok-k">REFERENCES</span> categorias(id);</pre>
+  <div class="box"><div class="box-title">store()/update() ja sao dinamicos</div><div class="box-body">Como <code>db::store()</code> e <code>db::update()</code> montam a query a partir das chaves do array recebido, basta enviar <code>"categoria_id"</code> no JSON do <code>POST</code>/<code>PUT /produtos</code> — <strong>nao e necessario alterar</strong> <code>Produto::criar()</code>.</div></div>
+  <div class="slide-number">16 / 26</div>
+</div>
+
+<!-- SLIDE 17: JOIN COM PDO -->
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>JOIN — Trazer dados relacionados</h1>
+  <p>Quando buscamos um produto, queremos tambem o nome da sua categoria. Para um <code>JOIN</code> customizado, o Model precisa acessar a conexao PDO — adicione um getter em <code>db.class.php</code>.</p>
+<pre>&lt;?php
+<span class="tok-c">// config/db.class.php — adicione este metodo publico</span>
+<span class="tok-k">public function</span> getConn() {
+    <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;conn;
+}</pre>
+<pre>&lt;?php
+<span class="tok-c">// model/Produto.php — metodo com JOIN</span>
+<span class="tok-k">public function</span> buscarComCategoria(<span class="tok-k">int</span> <span class="tok-v">$id</span>): ?<span class="tok-k">array</span> {
+    <span class="tok-v">$sql</span> = <span class="tok-s">"SELECT p.*, c.nome AS categoria_nome
+             FROM produtos p
+             LEFT JOIN categorias c ON p.categoria_id = c.id
+             WHERE p.id = ?"</span>;
+    <span class="tok-v">$stmt</span> = <span class="tok-v">$this</span>-&gt;db-&gt;getConn()-&gt;prepare(<span class="tok-v">$sql</span>);
+    <span class="tok-v">$stmt</span>-&gt;execute([<span class="tok-v">$id</span>]);
+    <span class="tok-v">$r</span> = <span class="tok-v">$stmt</span>-&gt;fetch(PDO::FETCH_ASSOC);
+    <span class="tok-k">return</span> <span class="tok-v">$r</span> ?: <span class="tok-k">null</span>;
+}
+
+<span class="tok-c">// model/Produto.php — listar por categoria</span>
+<span class="tok-k">public function</span> listarPorCategoria(<span class="tok-k">int</span> <span class="tok-v">$catId</span>): <span class="tok-k">array</span> {
+    <span class="tok-v">$sql</span> = <span class="tok-s">"SELECT * FROM produtos WHERE categoria_id = ?"</span>;
+    <span class="tok-v">$stmt</span> = <span class="tok-v">$this</span>-&gt;db-&gt;getConn()-&gt;prepare(<span class="tok-v">$sql</span>);
+    <span class="tok-v">$stmt</span>-&gt;execute([<span class="tok-v">$catId</span>]);
+    <span class="tok-k">return</span> <span class="tok-v">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);
+}</pre>
+  <div class="warn"><div class="warn-title">Acesso a conexao PDO</div><div class="box-body">Prefira criar <code>getConn(): PDO</code> (metodo publico) a tornar a propriedade <code>$conn</code> publica diretamente.</div></div>
+  <div class="slide-number">17 / 26</div>
+</div>
+
+<!-- SLIDE 18: RELACIONAMENTO NM -->
+<div class="slide compact">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Relacionamento N:M (Pedidos &harr; Produtos)</h1>
+  <p>Um pedido pode ter varios produtos, e um produto pode estar em varios pedidos. Usamos uma <strong>tabela intermediaria</strong> (pivot).</p>
+<pre><span class="tok-c">-- Tabela intermediaria (pivot)</span>
+<span class="tok-k">CREATE TABLE</span> pedido_produto (
+    pedido_id    <span class="tok-k">INT</span>,
+    produto_id   <span class="tok-k">INT</span>,
+    quantidade   <span class="tok-k">INT</span> <span class="tok-k">DEFAULT</span> 1,
+    <span class="tok-k">PRIMARY KEY</span> (pedido_id, produto_id),
+    <span class="tok-k">FOREIGN KEY</span> (pedido_id)  <span class="tok-k">REFERENCES</span> pedidos(id),
+    <span class="tok-k">FOREIGN KEY</span> (produto_id) <span class="tok-k">REFERENCES</span> produtos(id)
+);
+
+<span class="tok-c">-- JOIN para listar produtos de um pedido</span>
+<span class="tok-k">SELECT</span> p.nome, p.preco, pp.quantidade
+<span class="tok-k">FROM</span> pedido_produto pp
+<span class="tok-k">JOIN</span> produtos p <span class="tok-k">ON</span> pp.produto_id = p.id
+<span class="tok-k">WHERE</span> pp.pedido_id = ?;</pre>
+<pre>&lt;?php
+<span class="tok-c">// model/Pedido.php — listar produtos do pedido (exercicio para casa)</span>
+<span class="tok-k">public function</span> produtosDoPedido(<span class="tok-k">int</span> <span class="tok-v">$pedidoId</span>): <span class="tok-k">array</span> {
+    <span class="tok-v">$sql</span> = <span class="tok-s">"SELECT p.nome, p.preco, pp.quantidade
+             FROM pedido_produto pp
+             JOIN produtos p ON pp.produto_id = p.id
+             WHERE pp.pedido_id = ?"</span>;
+    <span class="tok-v">$stmt</span> = <span class="tok-v">$this</span>-&gt;db-&gt;getConn()-&gt;prepare(<span class="tok-v">$sql</span>);
+    <span class="tok-v">$stmt</span>-&gt;execute([<span class="tok-v">$pedidoId</span>]);
+    <span class="tok-k">return</span> <span class="tok-v">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);
+}</pre>
+  <div class="box"><div class="box-title">Ainda nao existe no projeto</div><div class="box-body"><code>pedidos</code> e <code>pedido_produto</code> nao existem em <code>php/api</code> — sao o desafio da tarefa de casa (slide 24).</div></div>
+  <div class="slide-number">18 / 26</div>
+</div>
+
+<!-- SLIDE 19: EXERCICIO AULA 3 -->
+<div class="slide">
+  <div class="aula-tag aula3">Aula 3</div>
+  <h1>Exercicio — Aula 3 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~25 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Migrar o banco</div>
+    <div class="box-body">Crie a tabela <code>categorias</code> e adicione <code>categoria_id</code> (com <code>FOREIGN KEY</code>) em <code>produtos</code> via <code>ALTER TABLE</code>. Vincule os 3 produtos existentes a categorias.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. API com JOIN</div>
+    <div class="box-body">Adicione <code>getConn()</code> em <code>config/db.class.php</code> e <code>buscarComCategoria($id)</code> em <code>model/Produto.php</code>. Atualize <code>ProdutoController::buscar()</code> para retornar tambem o nome da categoria.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Listar por categoria</div>
+    <div class="box-body">Crie <code>CategoriaController::listarProdutos($id)</code> e a rota <code>GET /categorias/{id}/produtos</code>. Teste no Postman.</div>
+  </div>
+  <div class="slide-number">19 / 26</div>
+</div>
+
+<!-- SLIDE 20: DIVISOR AULA 4 -->
+<div class="slide divider">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Buscas e Validacoes</h1>
+  <div class="sub">Search, LIKE e validacao robusta de dados</div>
+  <div class="slide-number">20 / 26</div>
+</div>
+
+<!-- SLIDE 21: BUSCA AVANCADA -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Busca avancada com findAllBy() e LIKE</h1>
+  <p>A classe <code>db</code> possui o metodo <code>findBy()</code>, que retorna <strong>apenas o primeiro</strong> registro. Para buscar <strong>todos</strong> os registros que coincidem, usamos <code>findAllBy()</code>.</p>
+<pre>&lt;?php
+<span class="tok-c">// config/db.class.php — metodo para retornar varios registros</span>
+<span class="tok-k">public function</span> findAllBy(<span class="tok-v">$campo</span>, <span class="tok-v">$valor</span>) {
+    <span class="tok-v">$sql</span> = <span class="tok-s">"SELECT * FROM $this-&gt;table_name WHERE $campo LIKE ?"</span>;
+    <span class="tok-v">$st</span> = <span class="tok-v">$this</span>-&gt;conn-&gt;prepare(<span class="tok-v">$sql</span>);
+    <span class="tok-v">$st</span>-&gt;execute([<span class="tok-s">"%$valor%"</span>]);
+
+    <span class="tok-k">return</span> <span class="tok-v">$st</span>-&gt;fetchAll(PDO::FETCH_CLASS);
+}</pre>
+<pre>&lt;?php
+<span class="tok-c">// model/Produto.php — busca todos os produtos por campo</span>
+<span class="tok-k">public function</span> buscarPor(<span class="tok-k">string</span> <span class="tok-v">$campo</span>, <span class="tok-v">$valor</span>): <span class="tok-k">array</span> {
+    <span class="tok-k">return</span> <span class="tok-v">$this</span>-&gt;db-&gt;findAllBy(<span class="tok-v">$campo</span>, <span class="tok-v">$valor</span>);
+    <span class="tok-c">// Busca em qualquer campo permitido com LIKE '%valor%'</span>
+}
+
+<span class="tok-c">// controller/ProdutoController.php</span>
+<span class="tok-k">private const</span> CAMPOS_BUSCA_PERMITIDOS = [<span class="tok-s">'nome'</span>, <span class="tok-s">'preco'</span>, <span class="tok-s">'quantidade'</span>];
+
+<span class="tok-k">public function</span> buscarPor(): <span class="tok-k">void</span> {
+    <span class="tok-v">$campo</span> = <span class="tok-v">$_GET</span>[<span class="tok-s">'campo'</span>] ?? <span class="tok-s">''</span>;
+    <span class="tok-v">$valor</span> = <span class="tok-v">$_GET</span>[<span class="tok-s">'valor'</span>] ?? <span class="tok-s">''</span>;
+
+    <span class="tok-k">if</span>(!<span class="tok-k">in_array</span>(<span class="tok-v">$campo</span>, <span class="tok-k">self</span>::CAMPOS_BUSCA_PERMITIDOS, <span class="tok-k">true</span>)) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Campo de busca invalido. Use: '</span> . <span class="tok-k">implode</span>(<span class="tok-s">', '</span>, <span class="tok-k">self</span>::CAMPOS_BUSCA_PERMITIDOS), 400);
+        <span class="tok-k">return</span>;
+    }
+    <span class="tok-k">if</span>(<span class="tok-v">$valor</span> === <span class="tok-s">''</span>) {
+        <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-s">'Informe o parametro valor'</span>, 400);
+        <span class="tok-k">return</span>;
+    }
+
+    <span class="tok-v">$produtos</span> = <span class="tok-v">$this</span>-&gt;model-&gt;buscarPor(<span class="tok-v">$campo</span>, <span class="tok-v">$valor</span>);
+    <span class="tok-v">$this</span>-&gt;view-&gt;renderListar(<span class="tok-v">$produtos</span>); <span class="tok-c">// retorna array (vazio ou cheio)</span>
+}
+
+<span class="tok-c">// index.php — rota de busca</span>
+<span class="tok-k">elseif</span>(<span class="tok-v">$url</span>[0] === <span class="tok-s">'produtos'</span> && (<span class="tok-v">$url</span>[1] ?? <span class="tok-k">null</span>) === <span class="tok-s">'buscar'</span> && <span class="tok-v">$metodo</span> === <span class="tok-s">'GET'</span>) {
+    <span class="tok-v">$controller</span>-&gt;buscarPor();
+}</pre>
+  <div class="two-col">
+    <div class="box"><div class="box-title">findAllBy()</div><div class="box-body">Metodo da classe <code>db</code> que aplica <code>LIKE '%valor%'</code> em um campo e retorna <strong>array</strong> de objetos.</div></div>
+    <div class="box"><div class="box-title">Query string</div><div class="box-body">A busca usa <code>GET /produtos/buscar?campo=nome&valor=Camisa</code>. O termo vem por <code>$_GET</code>, nao pelo body.</div></div>
+  </div>
+  <div class="warn"><div class="warn-title">Whitelist de campos</div><div class="box-body">Nunca concatene nomes de colunas vindos da URL sem validar. Use uma lista de campos permitidos para evitar SQL injection.</div></div>
+  <div class="slide-number">21 / 26</div>
+</div>
+
+<!-- SLIDE 22: VALIDACOES -->
+<div class="slide compact">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Validacoes de dados — Regras de negocio</h1>
+  <p>Validacoes garantem que apenas dados corretos cheguem ao banco. A pasta <code>utils/</code> ja existe no projeto, mas ainda esta vazia — vamos criar <code>Validador.php</code>.</p>
+<pre>&lt;?php
+<span class="tok-c">// utils/Validador.php (crie este arquivo)</span>
+<span class="tok-k">class</span> Validador {
+    <span class="tok-k">public static function</span> min(<span class="tok-k">string</span> <span class="tok-v">$valor</span>, <span class="tok-k">int</span> <span class="tok-v">$min</span>): <span class="tok-k">bool</span> {
+        <span class="tok-k">return</span> <span class="tok-k">strlen</span>(<span class="tok-v">$valor</span>) &gt;= <span class="tok-v">$min</span>;
+    }
+    <span class="tok-k">public static function</span> positivo(<span class="tok-k">float</span> <span class="tok-v">$valor</span>): <span class="tok-k">bool</span> {
+        <span class="tok-k">return</span> <span class="tok-v">$valor</span> &gt; 0;
+    }
+    <span class="tok-k">public static function</span> email(<span class="tok-k">string</span> <span class="tok-v">$valor</span>): <span class="tok-k">bool</span> {
+        <span class="tok-k">return</span> <span class="tok-k">filter_var</span>(<span class="tok-v">$valor</span>, FILTER_VALIDATE_EMAIL) !== <span class="tok-k">false</span>;
+    }
+}
+
+<span class="tok-c">// controller/ProdutoController.php — validacao completa (metodo criar)</span>
+<span class="tok-k">require_once</span> <span class="tok-v">__DIR__</span> . <span class="tok-s">'/../utils/Validador.php'</span>;
+<span class="tok-c">// ...</span>
+<span class="tok-v">$erros</span> = [];
+<span class="tok-k">if</span>(!<span class="tok-k">Validador</span>::min(<span class="tok-v">$dados</span>[<span class="tok-s">'nome'</span>], 3))          <span class="tok-v">$erros</span>[] = <span class="tok-s">"Nome: min 3 caracteres"</span>;
+<span class="tok-k">if</span>(!<span class="tok-k">Validador</span>::positivo((<span class="tok-k">float</span>)<span class="tok-v">$dados</span>[<span class="tok-s">'preco'</span>])) <span class="tok-v">$erros</span>[] = <span class="tok-s">"Preco deve ser positivo"</span>;
+<span class="tok-k">if</span>(!<span class="tok-k">empty</span>(<span class="tok-v">$erros</span>)) {
+    <span class="tok-v">$this</span>-&gt;view-&gt;renderErro(<span class="tok-k">implode</span>(<span class="tok-s">'; '</span>, <span class="tok-v">$erros</span>), 400);
+    <span class="tok-k">return</span>;
+}</pre>
+  <div class="box"><div class="box-title">Lista de erros</div><div class="box-body">Em vez de retornar um erro de cada vez, acumule todos em um array e junte com <code>implode()</code> na mensagem. O frontend recebe o feedback completo de uma vez.</div></div>
+  <div class="slide-number">22 / 26</div>
+</div>
+
+<!-- SLIDE 23: EXERCICIO AULA 4 -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicio — Aula 4 (em sala)</h1>
+  <p><span class="tag tag-purple">Tempo: ~20 min</span> <span class="tag tag-green">Pratica no PC</span></p>
+  <div class="exercise">
+    <div class="ex-title">1. Busca com findAllBy()</div>
+    <div class="box-body">Implemente <code>GET /produtos/buscar?campo=nome&valor=Camisa</code> usando <code>ProdutoController::buscarPor()</code> e <code>Produto::buscarPor()</code> (metodo <code>findAllBy()</code> da classe <code>db</code>). Valide que o campo esteja na whitelist e retorne todos os registros.</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">2. Criar utils/Validador.php</div>
+    <div class="box-body">Implemente a classe com <code>min()</code>, <code>positivo()</code> e <code>email()</code>. Use-a em <code>ProdutoController::criar()</code> para validar <code>nome</code> (min 3 chars) e <code>preco</code> (positivo).</div>
+  </div>
+  <div class="exercise">
+    <div class="ex-title">3. Teste integrado</div>
+    <div class="box-body">Teste no Postman: crie um produto com dados invalidos (deve retornar 400 + mensagem de erros), depois com dados validos (201). Busque por nome parcial.</div>
+  </div>
+  <div class="slide-number">23 / 26</div>
+</div>
+
+<!-- SLIDE 24: EXERCICIOS PARA CASA -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Exercicios para casa — E08</h1>
+  <p><span class="tag tag-blue">Entrega: proximo encontro</span></p>
+  <div class="homework">
+    <div class="hw-title">1. API de Clientes e Pedidos</div>
+    <div class="box-body">Crie as tabelas <code>clientes</code> (id, nome, email, telefone) e <code>pedidos</code> (id, cliente_id, total, data). Implemente o CRUD completo de clientes via API REST com validacoes (email valido, telefone com min 8 digitos).</div>
+  </div>
+  <div class="homework">
+    <div class="hw-title">2. Pedidos com itens (N:M)</div>
+    <div class="box-body">Crie a tabela <code>pedido_item</code> (pedido_id, produto_id, quantidade, subtotal). Implemente <code>POST /pedidos</code> que receba um JSON com cliente_id e um array de itens. Use transacao (<code>beginTransaction</code>) para garantir que o pedido e os itens sejam inseridos juntos.</div>
+  </div>
+  <div class="homework">
+    <div class="hw-title">3. Relatorio com JOIN</div>
+    <div class="box-body">Crie o endpoint <code>GET /pedidos/{id}/detalhes</code> que retorne: dados do pedido, nome do cliente e lista de produtos com quantidade e subtotal. Use JOINs e retorne tudo em um unico JSON estruturado.</div>
+  </div>
+  <div class="homework">
+    <div class="hw-title">4. Documentacao da API</div>
+    <div class="box-body">Crie um arquivo <code>README.md</code> listando todos os endpoints da sua API (metodo, URL, parametros, exemplo de resposta). Isso sera o "contrato" que o time de React Native usara.</div>
+  </div>
+  <div class="slide-number">24 / 26</div>
+</div>
+
+<!-- SLIDE 25: RESUMO -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Resumo do E08</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">CRUD REST completo</div><div class="box-body">GET (listar/buscar), POST (criar), PUT (atualizar), DELETE (remover). Todos usando <code>db.class.php</code> com prepared statements e MVC.</div></div>
+    <div class="box"><div class="box-title">Tratamento de erros</div><div class="box-body">Validacoes no Controller antes de chamar o Model. Respostas padronizadas com <code>sucesso</code>, <code>erro</code> e status codes semanticos (200, 201, 400, 404, 500).</div></div>
+  </div>
+  <div class="two-col" style="margin-top: 10px;">
+    <div class="box"><div class="box-title">Relacionamentos</div><div class="box-body">1:N com <code>FOREIGN KEY</code> e JOINs para trazer dados relacionados. N:M com tabela pivot e queries customizadas via <code>$db->getConn()->prepare()</code>.</div></div>
+    <div class="box"><div class="box-title">Buscas e validacoes</div><div class="box-body"><code>findAllBy()</code> com <code>LIKE</code> para busca parcial e retorno de varios registros. Whitelist de campos para seguranca. Classe <code>Validador</code> com regras reutilizaveis. Array de erros para feedback completo ao frontend.</div></div>
+  </div>
+  <div style="margin-top: 14px; text-align: center;">
+    <p style="font-size: 15px; color: #334155;"><strong>Checklist do E08</strong></p>
+    <p style="font-size: 13px; color: #64748b;">
+      <span class="tag">CRUD completo</span>
+      <span class="tag">Validacoes</span>
+      <span class="tag">Status codes</span>
+      <span class="tag">1:N JOIN</span>
+      <span class="tag">N:M pivot</span>
+      <span class="tag">Search LIKE</span>
+      <span class="tag">findAllBy()</span>
+    </p>
+  </div>
+  <div class="slide-number">25 / 26</div>
+</div>
+
+<!-- SLIDE 26: ENCERRAMENTO -->
+<div class="slide">
+  <div class="aula-tag aula4">Aula 4</div>
+  <h1>Proximos passos</h1>
+  <div class="two-col">
+    <div class="box"><div class="box-title">E09 — Autenticacao JWT</div><div class="box-body">Tokens de acesso, login/senha, middleware de protecao de rotas. A API passara a exigir autenticacao.</div></div>
+    <div class="box"><div class="box-title">E10 — Consumo no React Native</div><div class="box-body">O app mobile fara requisicoes <code>fetch()</code> para a API PHP. Listagem, formularios e navegacao com dados reais.</div></div>
+  </div>
+  <div style="margin-top: 24px; text-align: center; color: #555;">
+    <p style="font-size: 15px;"><strong>Duvidas sobre o E08?</strong></p>
+    <p style="font-size: 13px; color: #888; margin-top: 8px;">Envie no Classroom ou me procure no intervalo.</p>
+    <p style="font-size: 13px; color: #888; margin-top: 6px;">Nao esqueca da tarefa para casa! 🏠</p>
+  </div>
+  <div style="position: absolute; bottom: 8mm; left: 12mm; display: flex; align-items: center; gap: 10px;">
+    <div class="ifsc-grid" style="grid-template-columns: repeat(3, 8px); grid-template-rows: repeat(3, 8px); gap: 2px;">
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+      <span style="background:#006633"></span><span style="background:#FF6600"></span><span style="background:#006633"></span>
+    </div>
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #006633; line-height: 1.3;">Instituto Federal<br><span style="font-weight: 400; color: #64748b;">Santa Catarina</span></div>
+  </div>
+  <div class="slide-number">26 / 26</div>
+</div>
+
+</body>
+</html>

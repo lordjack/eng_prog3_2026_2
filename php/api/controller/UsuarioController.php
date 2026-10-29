@@ -1,108 +1,123 @@
 <?php
 
-// controllers/UsuarioController.php
+// controller/UsuarioController.php
 
-require_once 'model/Usuario.php';
-require_once 'JSON.php';
+require_once __DIR__ . '/../model/Usuario.php';
+require_once __DIR__ . '/JSON.php';
+require_once __DIR__ . '/../view/usuario_json.php';
 
 class UsuarioController extends JSON
 {
     private Usuario $model;
+    private UsuarioJsonView $view;
 
     public function __construct()
     {
         $this->model = new Usuario();
+        $this->view = new UsuarioJsonView();
     }
 
-    public function criar(): void
-    {
-        try {
-            $dados = $this->getData();
-
-            if (
-                empty($dados['nome']) ||
-                !isset($dados['email']) ||
-                !isset($dados['telefone'])
-            ) {
-                $this->respostaError(
-                    'Campos obrigatórios: nome, preço, quantidade',
-                    400
-                );
-                return;
-            }
-
-            $this->model->criar($dados);
-
-            $this->resposta([
-                'sucesso' => true,
-                'dados' => 'Criado com sucesso!',
-            ]);
-        } catch (Exception $e) {
-            $this->respostaError($e->getMessage());
-        }
-    }
-
-    public function atualizar(): void
-    {
-        $dados = $this->getData();
-
-        $this->model->atualizar($dados);
-
-        $this->resposta([
-            'sucesso' => true,
-            'dados' => 'Atualizado com sucesso!',
-        ]);
-    }
-
-    public function excluir($id): void
-    {
-        $this->model->excluir($id);
-
-        $this->resposta([
-            'sucesso' => true,
-            'dados' => 'Excluido com sucesso!',
-        ]);
-    }
-
+    // GET /usuarios
     public function listar(): void
     {
         $usuarios = $this->model->listar();
-        $this->resposta(['sucesso' => true, 'dados' => $usuarios]);
+        $this->view->renderListar($usuarios);
     }
 
-    public function buscarPor(): void
-    {
-        $campo = $_GET['campo'];
-        $valor = $_GET['valor'];
-
-        $usuario = $this->model->buscarPor($campo, $valor);
-
-        if ($usuario) {
-            $this->resposta(['sucesso' => true, 'dados' => $usuario]);
-        } else {
-            $this->resposta(
-                [
-                    'sucesso' => false,
-                    'erro' => 'Usuario nao encontrado',
-                ],
-                404
-            );
-        }
-    }
-
+    // GET /usuarios/{id}
     public function buscar(int $id): void
     {
         $usuario = $this->model->buscar($id);
         if ($usuario) {
-            $this->resposta(['sucesso' => true, 'dados' => $usuario]);
+            $this->view->renderBuscar($usuario);
         } else {
-            $this->resposta(
-                [
-                    'sucesso' => false,
-                    'erro' => 'Usuario nao encontrado',
-                ],
-                404
-            );
+            $this->view->renderErro('Usuario nao encontrado', 404);
         }
+    }
+
+    // POST /usuarios
+    public function criar(): void
+    {
+        $dados = $this->getDadosRequisicao();
+
+        if (empty($dados['nome']) || empty($dados['email'])) {
+            $this->view->renderErro('Campos obrigatorios: nome, email', 400);
+            return;
+        }
+
+        if (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->view->renderErro('Email invalido', 400);
+            return;
+        }
+
+        try {
+            $this->model->criar([
+                'nome' => $dados['nome'],
+                'email' => $dados['email'],
+                'telefone' => $dados['telefone'] ?? null,
+                'ativo' => isset($dados['ativo']) ? (int) $dados['ativo'] : 1,
+            ]);
+            $this->view->renderCriar();
+        } catch (Exception $e) {
+            $this->view->renderErro($e->getMessage(), 500);
+        }
+    }
+
+    // PUT /usuarios/{id}
+    public function atualizar(int $id): void
+    {
+        if (!$this->model->buscar($id)) {
+            $this->view->renderErro('Usuario nao encontrado', 404);
+            return;
+        }
+
+        $dados = $this->getDadosRequisicao();
+
+        if (empty($dados)) {
+            $this->view->renderErro('Nenhum dado enviado para atualizacao', 400);
+            return;
+        }
+
+        if (isset($dados['email']) && !filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->view->renderErro('Email invalido', 400);
+            return;
+        }
+
+        try {
+            if (isset($dados['ativo'])) {
+                $dados['ativo'] = (int) $dados['ativo'];
+            }
+            $this->model->atualizar($id, $dados);
+            $this->view->renderAtualizar();
+        } catch (Exception $e) {
+            $this->view->renderErro($e->getMessage(), 500);
+        }
+    }
+
+    // DELETE /usuarios/{id}
+    public function excluir(int $id): void
+    {
+        if (!$this->model->buscar($id)) {
+            $this->view->renderErro('Usuario nao encontrado', 404);
+            return;
+        }
+
+        try {
+            $this->model->excluir($id);
+            $this->view->renderExcluir();
+        } catch (Exception $e) {
+            $this->view->renderErro($e->getMessage(), 500);
+        }
+    }
+
+    protected function getDadosRequisicao(): array
+    {
+        $json = file_get_contents('php://input');
+        return json_decode($json, true) ?? [];
+    }
+
+    public function rotaNaoEncontrada(): void
+    {
+        $this->view->renderErro('Rota nao encontrada', 404);
     }
 }

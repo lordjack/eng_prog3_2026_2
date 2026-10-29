@@ -1,7 +1,7 @@
 <?php
 
-// models/Produto.php
-require_once 'config/db.class.php';
+// model/Produto.php
+require_once __DIR__ . '/../config/db.class.php';
 
 class Produto
 {
@@ -24,10 +24,9 @@ class Produto
         return $dados ?: null;
     }
 
-    public function buscarPor(string $campo, string $valor): ?array
+    public function buscarPor(string $campo, string $valor): array
     {
-        $dados = $this->db->findBy($campo, $valor);
-        return $dados ?: null;
+        return $this->db->findBy($campo, $valor);
     }
 
     public function criar($dados): void
@@ -35,9 +34,9 @@ class Produto
         $this->db->store($dados);
     }
 
-    public function atualizar($dados): void
+    public function atualizar(int $id, array $dados): void
     {
-        $this->db->update($dados['id'], $dados);
+        $this->db->update($id, $dados);
     }
 
     public function excluir(int $id): void

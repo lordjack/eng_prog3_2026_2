@@ -1,45 +1,123 @@
 <?php
 
 // index.php — roteador central
-require_once 'controller/ProdutoController.php';
-require_once 'controller/UsuarioController.php';
+require_once __DIR__ . '/controller/ProdutoController.php';
+require_once __DIR__ . '/controller/CategoriaController.php';
+require_once __DIR__ . '/controller/UsuarioController.php';
 
 $url = $_GET['url'] ?? '';
 $url = explode('/', trim($url, '/'));
 $metodo = $_SERVER['REQUEST_METHOD'];
-$urlModel = $url[0] ?? '';
 
-if ($url[0] == 'produtos') {
+$recurso = $url[0] ?? '';
+$id = is_numeric($url[1] ?? '') ? (int) $url[1] : null;
+$acao = $url[1] ?? '';
+
+// ============================================================
+// ROTAS DE PRODUTOS
+// ============================================================
+if ($recurso === 'produtos') {
     $controller = new ProdutoController();
-} elseif ($url[0] == 'usuarios') {
-    $controller = new UsuarioController();
-} else {
-    $controller->resposta(['erro' => 'Rota nao encontrada'], 404);
+
+    // GET /produtos
+    if (empty($acao) && $metodo === 'GET') {
+        $controller->listar();
+    }
+    // GET /produtos/buscar?campo=...&valor=...
+    elseif ($acao === 'buscar' && $metodo === 'GET') {
+        $controller->buscarPor();
+    }
+    // GET /produtos/{id}
+    elseif ($id !== null && $metodo === 'GET') {
+        $controller->buscar($id);
+    }
+    // POST /produtos
+    elseif (empty($acao) && $metodo === 'POST') {
+        $controller->criar();
+    }
+    // PUT /produtos/{id}
+    elseif ($id !== null && $metodo === 'PUT') {
+        $controller->atualizar($id);
+    }
+    // DELETE /produtos/{id}
+    elseif ($id !== null && $metodo === 'DELETE') {
+        $controller->excluir($id);
+    }
+    else {
+        $controller->rotaNaoEncontrada();
+    }
 }
 
-//GET produtos
-if ($url[0] === $urlModel && empty($url[1]) && $metodo == 'GET') {
-    $controller->listar();
+// ============================================================
+// ROTAS DE CATEGORIAS (relacionamento 1:N com Produtos)
+// ============================================================
+elseif ($recurso === 'categorias') {
+    $controller = new CategoriaController();
 
-    //GET produtos/{id}
-} elseif ($url[0] === $urlModel && is_numeric($url[1]) && $metodo == 'GET') {
-    $controller->buscar((int) $url[1]);
+    // GET /categorias
+    if (empty($acao) && $metodo === 'GET') {
+        $controller->listar();
+    }
+    // GET /categorias/{id}
+    elseif ($id !== null && $metodo === 'GET' && empty($url[2])) {
+        $controller->buscar($id);
+    }
+    // GET /categorias/{id}/produtos
+    elseif ($id !== null && ($url[2] ?? '') === 'produtos' && $metodo === 'GET') {
+        $controller->listarProdutos($id);
+    }
+    // POST /categorias
+    elseif (empty($acao) && $metodo === 'POST') {
+        $controller->criar();
+    }
+    // PUT /categorias/{id}
+    elseif ($id !== null && $metodo === 'PUT') {
+        $controller->atualizar($id);
+    }
+    // DELETE /categorias/{id}
+    elseif ($id !== null && $metodo === 'DELETE') {
+        $controller->excluir($id);
+    }
+    else {
+        $controller->rotaNaoEncontrada();
+    }
+}
 
-    //GET produtos/buscar?campo...&valor=...
-} elseif ($url[0] === $urlModel && $url[1] === 'buscar' && $metodo == 'GET') {
-    $controller->buscarPor();
+// ============================================================
+// ROTAS DE USUARIOS
+// ============================================================
+elseif ($recurso === 'usuarios') {
+    $controller = new UsuarioController();
 
-    //POST produtos
-} elseif ($url[0] === $urlModel && empty($url[1]) && $metodo == 'POST') {
-    $controller->criar();
+    // GET /usuarios
+    if (empty($acao) && $metodo === 'GET') {
+        $controller->listar();
+    }
+    // GET /usuarios/{id}
+    elseif ($id !== null && $metodo === 'GET') {
+        $controller->buscar($id);
+    }
+    // POST /usuarios
+    elseif (empty($acao) && $metodo === 'POST') {
+        $controller->criar();
+    }
+    // PUT /usuarios/{id}
+    elseif ($id !== null && $metodo === 'PUT') {
+        $controller->atualizar($id);
+    }
+    // DELETE /usuarios/{id}
+    elseif ($id !== null && $metodo === 'DELETE') {
+        $controller->excluir($id);
+    }
+    else {
+        $controller->rotaNaoEncontrada();
+    }
+}
 
-    //PUT produtos/{id}
-} elseif ($url[0] === $urlModel && empty($url[1]) && $metodo == 'PUT') {
-    // var_dump($controller->getData());
-    //  exit();
-    $controller->atualizar();
-} elseif ($url[0] === $urlModel && is_numeric($url[1]) && $metodo == 'DELETE') {
-    $controller->excluir((int) $url[1]);
-} else {
-    $controller->resposta(['erro' => 'Rota nao encontrada'], 404);
+// ============================================================
+// ROTA NAO ENCONTRADA
+// ============================================================
+else {
+    $controller = new ProdutoController();
+    $controller->rotaNaoEncontrada();
 }
